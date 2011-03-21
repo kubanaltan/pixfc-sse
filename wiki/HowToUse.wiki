@@ -1,0 +1,57 @@
+#summary how to use pixfc-sse
+#labels Featured,Phase-Deploy
+
+In short, this is what you have to do:
+ * [HowToUse#Download_PixFC Download PixFC]
+ * [HowToUse#Build_PixFC Build PixFC]
+ * [HowTouse#Include_PixFC_in_your_project Include PixFC in your project]
+ 
+= Download PixFC=
+
+Grab the stable release from the [http://code.google.com/p/pixfc-sse/downloads/list Downloads] tab and unpack it, or get the latest version from Subversion (check the [http://code.google.com/p/pixfc-sse/source/checkout Source] tab for instructions).
+
+* Make sure you install [http://www.cmake.org CMake] before continuing. *
+
+= Build PixFC=
+
+Follow the instructions for your platform / environment. These will help you compile the PixFC library for a specific target platform or the one you will compile PixFC on.
+
+== Windows - Visual Studio solution ==
+
+Run a command prompt and change to the PixFC directory you downloaded in the previous step.
+
+Then run either of the following command depending on whether you want to compile PixFC in 32- or 64-bit mode:
+{{{
+cmake -G "Visual Studio 10"
+}}}
+or
+{{{
+cmake -G "Visual Studio 10 Win64"
+}}}
+This will generate a Microsoft Visual Studio 10 solution (`pixfc-sse.sln`). Open it in Visual Studio. Select either Debug or Release configuration and build the solution.
+
+The PixFC library (`libpixfc-sse.lib`) can then be found in the debug or release directory.
+
+== Mac & Linux - Makefile ==
+
+In a terminal, change to the PixFC directory and run the following commands:
+{{{
+cmake .
+make
+}}}
+
+This will build PixFC library (`libpixfc-sse.a`) in the current directory.
+
+== All Platforms - Eclipse CDT 4 ==
+
+From a terminal / command prompt, change to the PixFC directory and run:
+{{{
+cmake -G "Eclipse CDT 4 - Unix Makefiles"
+}}}
+Then, open Eclipse and import the project located in the current directory, and build the library.
+
+= Include PixFC in your project =
+
+Copy the PixFC library (built in the previous step) as well as the API header file (`pixfc-sse.h`) into your project's directory.
+
+The only thing left is to include `pixfc-sse.h` where appropriate (so you can call PixFC functions), and link your project to the PixFC library. On Linux, you must also link your application to librt with by passing `-lrt` to the linker.
