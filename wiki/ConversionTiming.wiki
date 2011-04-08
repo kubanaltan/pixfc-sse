@@ -10,5 +10,5 @@ The current list of supported conversions and timing information for each OS / a
 || OS || CPU || link ||
 || Linux || i5 || http://pixfc-sse.googlecode.com/svn/trunk/perf-results/i5-linux.txt ||
 || Linux || Xeon || http://pixfc-sse.googlecode.com/svn/trunk/perf-results/xeon-linux.txt ||
-|| OSX || Xeon ||  http://pixfc-sse.googlecode.com/svn/trunk/perf-results/xeon-mac.txt ||
+|| OSX || Xeon ||  http://pixfc-sse.googlecode.com/svn/trunk/perf-results/xeon-osx.txt ||
 || Windows  || i5 || http://pixfc-sse.googlecode.com/svn/trunk/perf-results/i5-win7.txt ||
