@@ -1,0 +1,48 @@
+This is a binary release of PixFC-SSE for Linux.
+
+PixFC-SSE is a cross platform C library which provides SSE-optimised functions
+to perform pixel format conversions efficiently.
+
+You provide the input / output buffers and formats, PixFC-SSE selects the best 
+conversion function to use based on the features supported by your CPU. In the 
+worst case scenario, PixFC-SSE falls back to a standard, non-SSE optimised 
+conversion function if the CPU has no SSE features. This way, PixFC-SSE 
+guarantees the conversion will always happen.
+
+The latest version of PixFC-SSE can be found at 
+http://pixfc-sse.googlecode.com
+
+
+== HOWTO ==
+Using PixFC in your own application is simple:
+- update your application to use the conversion functions in PixFC and,
+- link the PixFC static library to your application.
+
+The next sections explain each of these steps.
+
+
+== USAGE ==
+In your application, include the PixFC header file where appropriate (the
+header file is located in include/pixfc-sse.h). The use-case is then very
+simple:
+- Create a struct PixFcSSE by calling create_pixfc(...). You specify the input
+  and output formats, resolution, and optional flags to control the selection
+  of the conversion routine.
+- Then, every time you need to convert an image, call pixfc->convert(...) .
+- Release the struct PixFcSSE when you no longer need it by calling
+  destroy_pixfc(...).
+
+Take a look at example.c for a concrete example.
+
+
+== LINKING ==
+Link the PixFC static library (libpixfc-sse.a) to your application. Also link
+your application against librt by passing -lrt to the linker.
+
+
+== SUPPORT / CONTACT ==
+Feedback, comments and suggestions are greatly appreciated.
+Please, use the mailing list at 
+http://groups.google.com/group/pixfc-sse
+
+
