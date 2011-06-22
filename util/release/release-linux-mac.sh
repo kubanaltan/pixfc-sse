@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 function do_build_and_zip ()
 {
@@ -42,6 +42,7 @@ function do_build_and_zip ()
 	cp README.${os} "${destdir}/README"
 	cp COPYING "${destdir}/"
 	cp "${pixfc_dir}/example.c" "${destdir}/"
+	cp "${build_dir}/tools/unit-testing" "${destdir}/"
 
 	# create tar file
 	tar -zcvf "${destdir}_${os}-${arch}.tar.gz" "${destdir}"
@@ -56,11 +57,16 @@ if [ $# -ne 2 ]; then
 fi
 
 # check OS
-echo $OSTYPE | grep -q "linux"
-if [ $? -eq 0 ]; then
-	do_build_and_zip $1 "" $2 "linux" "x86"
-	do_build_and_zip $1 "-DCMAKE_C_FLAGS=-m64" $2 "linux" "x86_64"
-else
-	do_build_and_zip $1 "" $2 "osx" "x86_64"
-fi
+os="linux"
+echo $OSTYPE | grep -q "linux" || { os="osx"; }
+
+# check arch
+native_arch="x86"
+other_arch="x86_64"
+other_arch_cc_compile_flag="-m64"
+echo $MACHTYPE | grep -q "x86_64" && { native_arch="x86_64"; other_arch="x86"; other_arch_cc_compile_flag="-m32"; }
+
+# do build	
+do_build_and_zip $1 "" $2 "${os}" "${native_arch}"
+do_build_and_zip $1 "-DCMAKE_C_FLAGS=${other_arch_cc_compile_flag}" $2 "${os}" "${other_arch}"
 
