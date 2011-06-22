@@ -3,7 +3,7 @@
 
 The fastest way to test PixFC and include it in your application is to:
  * [HowToUse#Download_PixFC Download the PixFC binaries]
- * [HowTouse#Include_PixFC_in_your_project Include PixFC in your project]
+ * [HowToUse#Include_PixFC_in_your_project Include PixFC in your project]
 
 Instead of downloading the pre-built binaries, you can also download the source code and [HowToUse#Build_PixFC yourself] (longer).
  
@@ -74,4 +74,4 @@ cmake -G "Eclipse CDT 4 - Unix Makefiles" ..
 Then, copy `.project` and `.cproject` one directory up and import the project in Eclipse to build it.
 
 
-The next step is to include PixFC in you project and use it as described [HowTouse#Include_PixFC_in_your_project here].
+The next step is to include PixFC in you project and use it as described [HowToUse#Include_PixFC_in_your_project here].
