@@ -29,7 +29,7 @@ function do_build_and_zip ()
 	# Go back to where we were invoked from
 	popd
 
-	destdir="pixfc-sse-v${version}"
+	destdir="PixFC-SSE-${version}"
 
 	# create temp dir
 	rm -Rf "${destdir}"

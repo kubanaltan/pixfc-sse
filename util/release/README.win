@@ -13,6 +13,10 @@ The latest version of PixFC-SSE can be found at
 http://pixfc-sse.googlecode.com
 
 
+== PERFORMANCE TESTING ==
+Run unit-testing.exe to check how PixFC performs on you machine.
+
+
 == HOWTO ==
 Using PixFC in your own application is simple:
 - update your application to use the conversion functions in PixFC and,

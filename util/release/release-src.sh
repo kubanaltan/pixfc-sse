@@ -11,7 +11,7 @@ if [ ! -d "$1" ]; then
 	exit 1
 fi
 
-release_name=pixfc-sse-v$2
+release_name=PixFC-SSE-$2
 archive_name=${release_name}_src.zip
 
 # create temp dir

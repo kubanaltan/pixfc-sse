@@ -37,24 +37,20 @@ if NOT EXIST "%1" (
 ::
 :: Set variables
 ::
-set destdir=pixfc-sse-%2_win32
+set destdir=PixFC-SSE-%2
 set build_arch=32
+set build_dir="%1\build\temp"
+set archive_name="%destdir%_win32"
 
 :do_build
-:: Go to pixfc build dir
-pushd "%1\build"
-if NOT %ERRORLEVEL% EQU 0 (
-	echo Error switching to build directory
-	popd
-	exit /B 1
-)
-
 :: Remove previous build dir
-if EXIST temp (
-	rmdir /S /Q temp
+if EXIST "%build_dir%" (
+	rmdir /S /Q "%build_dir%"
 )
-mkdir temp
-cd temp
+mkdir "%build_dir%"
+
+:: Go to pixfc build dir
+pushd "%build_dir%"
 
 :: Build pixfc
 cmake -G "%cmake_gen%" ..\..
@@ -82,7 +78,7 @@ if EXIST %destdir% (
 mkdir %destdir%
 
 :: copy library and header files
-copy /B "%1\build\temp\src\Release\pixfc-sse.lib" "%destdir%"
+copy /B "%build_dir%\src\Release\pixfc-sse.lib" "%destdir%"
 mkdir "%destdir%\include"
 mkdir "%destdir%\include\win"
 copy /A "%1\include\pixfc-sse.h" "%destdir%\include"
@@ -90,9 +86,13 @@ copy /A "%1\include\win\stdint.h" "%destdir%\include\win"
 copy /A README.win "%destdir%\README"
 copy /A COPYING "%destdir%\"
 copy /A "%1\example.c" "%destdir%\"
+copy /B "%build_dir%\tools\Release\unit-testing.exe" "%destdir%\"
 
 :: create zip file
-"C:\Program Files\7-Zip\7z.exe" a -tzip "%destdir%.zip" "%destdir%"
+if EXIST "%archive_name%.zip" (
+	del "%archive_name%.zip"
+)
+"C:\Program Files\7-Zip\7z.exe" a -tzip "%archive_name%.zip" "%destdir%"
 
 :: Delete temp dir
 if EXIST %destdir% (
@@ -102,7 +102,7 @@ if EXIST %destdir% (
 :: Check if we need to build in 64-bit or if we are done
 if "%build_arch%"=="32" (
 	set build_arch=64
-	set destdir=pixfc-sse-%2_win64
 	set cmake_gen=%cmake_gen% Win64
+	set archive_name="PixFC-SSE-%2_win64"
 	goto do_build
 )
