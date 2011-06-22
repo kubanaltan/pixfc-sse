@@ -32,7 +32,7 @@ That's it !.
 
 *These instructions are ONLY for those who want to compile PixFC instead of using the provided binaries. You do not need to do this if you have followed the instructions above.*
 
-Make sure you install [http://www.cmake.org CMake] before continuing. Also download the PixFC source archive from the [Downloads] tab and unpack it (let's assume it is unpacked in `pixfc`). Next, follow the instructions for your platform / environment. These will help you compile the PixFC library for a specific target platform or for the platform you will compile PixFC on.
+Make sure you install [http://www.cmake.org CMake] before continuing. Also download the PixFC source archive from the [http://code.google.com/p/pixfc-sse/downloads/list Downloads] tab and unpack it (let's assume it is unpacked in `pixfc`). Next, follow the instructions for your platform / environment. These will help you compile the PixFC library for a specific target platform or for the platform you will compile PixFC on.
 
 == Windows - Visual Studio solution ==
 
