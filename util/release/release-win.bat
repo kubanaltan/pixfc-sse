@@ -1,4 +1,4 @@
-@echo off
+:: @echo off
 
 ::
 :: Carry out sanity checks first
@@ -41,6 +41,15 @@ set destdir=PixFC-SSE-%2
 set build_arch=32
 set build_dir="%1\build\temp"
 set archive_name="%destdir%_win32"
+if EXIST "C:\Program Files\7-Zip\7z.exe" (
+	set zip_cmd="C:\Program Files\7-Zip\7z.exe"
+) else (
+	if NOT EXIST "C:\Program Files (x86)\7-Zip\7z.exe" (
+		echo "Cant find 7-zip"
+		exit /B 1
+	)
+	set zip_cmd="C:\Program Files (x86)\7-Zip\7z.exe"
+)
 
 :do_build
 :: Remove previous build dir
@@ -92,7 +101,7 @@ copy /B "%build_dir%\tools\Release\unit-testing.exe" "%destdir%\"
 if EXIST "%archive_name%.zip" (
 	del "%archive_name%.zip"
 )
-"C:\Program Files\7-Zip\7z.exe" a -tzip "%archive_name%.zip" "%destdir%"
+%zip_cmd% a -tzip "%archive_name%.zip" "%destdir%"
 
 :: Delete temp dir
 if EXIST %destdir% (
