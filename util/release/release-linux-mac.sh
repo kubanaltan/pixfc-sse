@@ -42,6 +42,7 @@ function do_build_and_zip ()
 	cp README.${os} "${destdir}/README"
 	cp COPYING "${destdir}/"
 	cp "${pixfc_dir}/example.c" "${destdir}/"
+	cp "${pixfc_dir}/Changelog" "${destdir}/"
 	cp "${build_dir}/tools/unit-testing" "${destdir}/"
 
 	# create tar file
