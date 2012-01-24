@@ -7,24 +7,24 @@ function do_build_and_zip ()
 	version="$3"
 	os="$4"
 	arch="$5"
-	build_dir="${pixfc_dir}/build"
+	num_cpus=$6
+	build_dir="${pixfc_dir}/build/temp"
+
+	# create temp build dir
+	rm -Rf "${build_dir}"
+	mkdir "${build_dir}"
 
 	# Go to pixfc build dir
 	pushd "${build_dir}"
 	if [ $? -ne 0 ]; then
-		echo "Cant change to directory ${build_dir}"
+		echo "Cant change to temp build directory ${build_dir}"
+		popd
 		exit 1
 	fi
 
-	# create temp build dir
-	build_dir="${build_dir}/temp"
-	rm -Rf "${build_dir}"
-	mkdir "${build_dir}"
-	cd "${build_dir}" || { echo "Cant change to directory ${build_dir}"; popd; exit 1; }
-
 	# Build pixfc
 	cmake "${cmake_arg}"  ../.. || { echo "CMake failed"; popd; exit 1; }
-	make || { echo "Build failed"; popd; exit 1;  }
+	make -j ${num_cpus} || { echo "Build failed"; popd; exit 1;  }
 
 	# Go back to where we were invoked from
 	popd
@@ -52,8 +52,8 @@ function do_build_and_zip ()
 }
 
 # Check arguments
-if [ $# -ne 2 ]; then
-	echo "$0 <pixfc dir> <version tag>"
+if [ $# -ne 3 ]; then
+	echo "$0 <pixfc dir> <version tag> <num cpus>"
 	exit 1
 fi
 
@@ -68,6 +68,6 @@ other_arch_cc_compile_flag="-m64"
 echo $MACHTYPE | grep -q "x86_64" && { native_arch="x86_64"; other_arch="x86"; other_arch_cc_compile_flag="-m32"; }
 
 # do build	
-do_build_and_zip $1 "" $2 "${os}" "${native_arch}"
-do_build_and_zip $1 "-DCMAKE_C_FLAGS=${other_arch_cc_compile_flag}" $2 "${os}" "${other_arch}"
+do_build_and_zip $1 "" $2 "${os}" "${native_arch}" $3
+do_build_and_zip $1 "-DCMAKE_C_FLAGS=${other_arch_cc_compile_flag}" $2 "${os}" "${other_arch}" $3
 
