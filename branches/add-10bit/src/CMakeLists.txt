@@ -27,6 +27,7 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_bgr24.c
 	conversion_routines_from_bgr24_bt601.c
 	conversion_routines_from_bgr24_bt709.c
+	conversion_routines_from_v210.c
 )
 
 # header files

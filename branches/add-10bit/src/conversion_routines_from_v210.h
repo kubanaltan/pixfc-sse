@@ -33,7 +33,7 @@
  *
  */
 
-// V210 to ARGB			SSE2 SSS3 SSE41
+// V210 to ARGB			SSE2 SSSE3 SSE41
 void		upsample_n_convert_v210_to_argb_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
 void		convert_v210_to_argb_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
 // V210 to ARGB  		SSE2 SSSE3
@@ -41,32 +41,32 @@ void		upsample_n_convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE *, void *
 void		convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
+// V210 to BGRA 		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_bgra_sse2_ssse3_sse41(const struct PixFcSSE *, void* , void*);
+void		convert_v210_to_bgra_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
 // V210 to BGRA 		SSE2 SSSE3
-void		upsample_n_convert_v210_to_bgra_sse2_ssse3(const struct PixFcSSE *, void* , void*);
+void		upsample_n_convert_v210_to_bgra_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_v210_to_bgra_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// V210 to BGRA 		SSE2
-void		upsample_n_convert_v210_to_bgra_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_v210_to_bgra_sse2(const struct PixFcSSE *, void *, void *);
 
 
+// V210 to RGB24		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_rgb24_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+void		convert_v210_to_rgb24_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
 // V210 to RGB24		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_yuyv_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// V210 to RGB24		SSE2 slow repacking
-void		upsample_n_convert_yuyv_to_rgb24_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_rgb24_sse2(const struct PixFcSSE *, void *, void *);
+void		upsample_n_convert_v210_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to BGR24		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-// YUYV to BGR24		SSE2 slow repacking
-void		upsample_n_convert_yuyv_to_bgr24_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_bgr24_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to BGR24		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_bgr24_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_bgr24_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+// V210 to BGR24		SSE2 SSSE3
+void		upsample_n_convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to anyRGB		NON SSE
-void 		convert_yuyv_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+// V210 to anyRGB		NON SSE
+void 		convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 
 
@@ -85,40 +85,40 @@ void 		convert_yuyv_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* srcBuff
  *
  */
 
-// YUYV to ARGB			SSE2 SSS3
-void		upsample_n_convert_yuyv_to_argb_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_argb_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// YUYV to ARGB  		SSE2
-void		upsample_n_convert_yuyv_to_argb_bt601_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_argb_bt601_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to ARGB			SSE2 SSS3 SSE41
+void		upsample_n_convert_v210_to_argb_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_argb_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// V210 to ARGB  		SSE2 SSSE3
+void		upsample_n_convert_v210_to_argb_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_argb_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to BGRA 		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_bgra_bt601_sse2_ssse3(const struct PixFcSSE *, void* , void*);
-void		convert_yuyv_to_bgra_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// YUYV to BGRA 		SSE2
-void		upsample_n_convert_yuyv_to_bgra_bt601_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_yuyv_to_bgra_bt601_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to BGRA 		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_bgra_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void* , void*);
+void		convert_v210_to_bgra_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// V210 to BGRA 		SSE2 SSSE3
+void		upsample_n_convert_v210_to_bgra_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		convert_v210_to_bgra_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to RGB24		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_rgb24_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_yuyv_to_rgb24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// YUYV to RGB24		SSE2 slow repacking
-void		upsample_n_convert_yuyv_to_rgb24_bt601_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_rgb24_bt601_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to RGB24		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_rgb24_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+void		convert_v210_to_rgb24_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// V210 to RGB24		SSE2 SSSE3
+void		upsample_n_convert_v210_to_rgb24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_rgb24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to BGR24		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-// YUYV to BGR24		SSE2 slow repacking
-void		upsample_n_convert_yuyv_to_bgr24_bt601_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_bgr24_bt601_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to BGR24		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_bgr24_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_bgr24_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+// V210 to BGR24		SSE2 SSSE3
+void		upsample_n_convert_v210_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to anyRGB		NON SSE
-void 		convert_yuyv_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+// V210 to anyRGB		NON SSE
+void 		convert_v210_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 
 
@@ -135,53 +135,41 @@ void 		convert_yuyv_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* s
  *
  */
 
-// YUYV to ARGB			SSE2 SSS3
-void		upsample_n_convert_yuyv_to_argb_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_argb_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// YUYV to ARGB  		SSE2
-void		upsample_n_convert_yuyv_to_argb_bt709_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_argb_bt709_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to ARGB			SSE2 SSS3 SSE41
+void		upsample_n_convert_v210_to_argb_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_argb_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// V210 to ARGB  		SSE2 SSSE3
+void		upsample_n_convert_v210_to_argb_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_argb_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to BGRA 		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_bgra_bt709_sse2_ssse3(const struct PixFcSSE *, void* , void*);
-void		convert_yuyv_to_bgra_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// YUYV to BGRA 		SSE2
-void		upsample_n_convert_yuyv_to_bgra_bt709_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_yuyv_to_bgra_bt709_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to BGRA 		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_bgra_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void* , void*);
+void		convert_v210_to_bgra_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// V210 to BGRA 		SSE2 SSSE3
+void		upsample_n_convert_v210_to_bgra_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		convert_v210_to_bgra_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to RGB24		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_rgb24_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_yuyv_to_rgb24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-// YUYV to RGB24		SSE2 slow repacking
-void		upsample_n_convert_yuyv_to_rgb24_bt709_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_rgb24_bt709_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to RGB24		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_rgb24_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+void		convert_v210_to_rgb24_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// V210 to RGB24		SSE2 SSSE3
+void		upsample_n_convert_v210_to_rgb24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_rgb24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to BGR24		SSE2 SSSE3
-void		upsample_n_convert_yuyv_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-// YUYV to BGR24		SSE2 slow repacking
-void		upsample_n_convert_yuyv_to_bgr24_bt709_sse2(const struct PixFcSSE *, void *, void *);
-void		convert_yuyv_to_bgr24_bt709_sse2(const struct PixFcSSE *, void *, void *);
+// V210 to BGR24		SSE2 SSSE3 SSE41
+void		upsample_n_convert_v210_to_bgr24_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_bgr24_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+// V210 to BGR24		SSE2 SSSE3
+void		upsample_n_convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// YUYV to anyRGB		NON SSE
-void 		convert_yuyv_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+// V210 to anyRGB		NON SSE
+void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
-
-
-/*
- *  	Y U Y V
- *
- * 		T O
- *
- * 		Y U V 4 2 2 P
- */
-void		convert_yuyv_to_yuv422p_sse2(const struct PixFcSSE*, void*, void*);
-void		convert_yuyv_to_yuv422p_sse2_ssse3(const struct PixFcSSE*, void*, void*);
-void		convert_yuyv_to_yuv422p_nonsse(const struct PixFcSSE*, void*, void*);
 
 #endif 		// CONVERSION_ROUTINES_FROM_V210_H_
 

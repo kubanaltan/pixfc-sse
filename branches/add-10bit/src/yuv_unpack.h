@@ -595,7 +595,7 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 /*
  * Unpack 4 v210 vectors (24 pixels) into 6 vectors (Y, UV)
  *
- * Total latency:				80
+ * Total latency:				56 (sse41) / 64 (ssse3)
  * Number of pixels handled:	24
  *
  * INPUT
