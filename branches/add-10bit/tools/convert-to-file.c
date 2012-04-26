@@ -31,7 +31,7 @@
 
 // PIXFC FLAGS
 //#define PIXFC_FLAGS	PixFcFlag_BT601Conversion
-#define PIXFC_FLAGS	 PixFcFlag_NNbResamplingOnly// | PixFcFlag_SSE2Only
+#define PIXFC_FLAGS	 PixFcFlag_NNbResamplingOnly // | PixFcFlag_SSE2Only
 //#define PIXFC_FLAGS	PixFcFlag_NoSSE  |  PixFcFlag_NNbResamplingOnly
 //#define PIXFC_FLAGS	PixFcFlag_Default
 
