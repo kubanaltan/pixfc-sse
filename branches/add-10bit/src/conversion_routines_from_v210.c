@@ -49,7 +49,7 @@
 				V210_TO_RGB_RECIPE,\
 				unpack_4v_v210_to_y_uv_vectors_,\
 				pack_fn,\
-				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_,\
+				nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_,\
 				4,\
 				instr_set\
 		)
@@ -79,17 +79,17 @@ void		upsample_n_convert_yuyv_to_argb_sse2_ssse3_sse41(const struct PixFcSSE * p
 }
 */
 void		convert_v210_to_argb_sse2_ssse3_sse41(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	//CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2,	sse2_ssse3_sse41);
+	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2,	sse2_ssse3_sse41);
 }
 /*
 void		upsample_n_convert_yuyv_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	UPSAMPLE_AND_CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2);
 }
-
-void		convert_yuyv_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2);
-}
 */
+void		convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
+}
+
 /*
  * 		Y U Y V
  *
