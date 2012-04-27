@@ -566,14 +566,14 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	/* U1213	V1213	U1415	V1415	U1617	V1617	0		0 */\
 	\
 	_M(y1) = _mm_slli_si128(_M(y3), 8);									/* PSLLDQ			1	0.5 */\
-	yuv9_16_out[2] = _mm_or_si128(_M(y1), _M(y2));							/* POR              1	0.33 */\
+	yuv9_16_out[0] = _mm_or_si128(_M(y1), _M(y2));							/* POR              1	0.33 */\
 	/* Y8		Y9		Y10		Y11		Y12		Y13		Y14		Y15 */\
 	_M(y3) = _mm_srli_si128(_M(y3), 8);									/* PSRLDQ			1	0.5 */\
 	/* Y16		Y17		0		0		0		0		0		0 */\
 	\
 	\
 	_M(uv1) = _mm_slli_si128(_M(uv3), 8);								/* PSLLDQ			1	0.5 */\
-	yuv9_16_out[3] = _mm_or_si128(_M(uv1), _M(uv2));							/* POR              1	0.33 */\
+	yuv9_16_out[1] = _mm_or_si128(_M(uv1), _M(uv2));							/* POR              1	0.33 */\
 	/* U89		V89		U1011	V1011	U1213	V1213	U1415	V1415 */\
 	_M(uv3) = _mm_srli_si128(_M(uv3), 8);								/* PSRLDQ			1	0.5 */\
 	/* U1617	V1617	0		0		0		0		0		0 */\
@@ -584,11 +584,11 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	/* U1819	V1819	U2021	V2021	U2223	V2223	0		0 */\
 	\
 	_M(y1) = _mm_slli_si128(_M(y1), 4);									/* PSLLDQ			1	0.5 */\
-	yuv17_24_out[4] = _mm_or_si128(_M(y1), _M(y3));							/* POR              1	0.33 */\
+	yuv17_24_out[0] = _mm_or_si128(_M(y1), _M(y3));							/* POR              1	0.33 */\
 	/*	Y16		Y17		Y18		Y19		Y20		Y21		Y22		Y23 */\
 	\
 	_M(uv1) = _mm_slli_si128(_M(uv1), 4);								/* PSLLDQ			1	0.5 */\
-	yuv17_24_out[5] = _mm_or_si128(_M(uv1), _M(uv3));							/* POR              1	0.33 */\
+	yuv17_24_out[1] = _mm_or_si128(_M(uv1), _M(uv3));							/* POR              1	0.33 */\
 	/* U1617	V1617	U1819	V1819	U2021	V2021	U2223	V2223 */\
 }
 
