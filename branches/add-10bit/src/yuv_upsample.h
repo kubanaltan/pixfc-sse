@@ -119,7 +119,7 @@ EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3_sse41(__m128i* current
 /*
  * Calculate missing chroma values by averaging previous and current chroma values
  *
- * TOTAL LATENCY:			4
+ * TOTAL LATENCY:			2
  *
  * INPUT:
  * U1 0		V1 0	U3 0	V3 0	U5 0	V5 0	U7 0	V7 0

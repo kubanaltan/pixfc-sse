@@ -88,7 +88,7 @@ done:
 	return result;
 }
 
-static uint32_t		time_conversion_blocks() {
+static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt) {
 	uint32_t			index = 0;
 	struct PixFcSSE *	pixfc;
 	struct timings		timings;
@@ -99,6 +99,9 @@ static uint32_t		time_conversion_blocks() {
 
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
+		if ((source_fmt != PixFcFormatCount) && (conversion_blocks[index].source_fmt != source_fmt))
+			continue;
+
 		if (create_pixfc_for_conversion_block(index, &pixfc, WIDTH, HEIGHT) != 0) {
 			printf("Unable to test conversion block '%s'\n", conversion_blocks[index].name);
 			continue;
@@ -379,6 +382,10 @@ uint32_t	check_pixfc_flags() {
  * and also to print some averages of conversion latency.
  */
 int 				main(int argc, char **argv) {
+	PixFcPixelFormat	source_fmt = PixFcFormatCount;
+
+	if (argc == 2)
+		source_fmt = find_matching_pixel_format(argv[1]);
 
 	pixfc_log("\n");
 	pixfc_log("\t\tU N I T   T E S T I N G\n");
@@ -425,7 +432,7 @@ int 				main(int argc, char **argv) {
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Checking conversion block timing ... \n");
-	if (time_conversion_blocks() != 0) {
+	if (time_conversion_blocks(source_fmt) != 0) {
 		pixfc_log("FAILED\n");
 		return -1;
 	}
