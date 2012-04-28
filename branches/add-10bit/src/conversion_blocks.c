@@ -91,6 +91,14 @@ DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt
 #define		DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	BT709_CONVERSION | NNB_RESAMPLING, pix_mult_count, height_mult_count, desc_str_prefix " - bt.709 - SSE2 / SSSE3 / SSE41 - fast resampling")
 
+// AVG resampling SSE41 {FR, bt.601, bt.709) macros
+#define		DECLARE_AVG_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3_sse41, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	DEFAULT_ATTRIBUTE, pix_mult_count, height_mult_count, desc_str_prefix " - SSE2 / SSSE3 / SSE41")
+#define		DECLARE_AVG_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	BT601_CONVERSION, pix_mult_count, height_mult_count, desc_str_prefix " - bt.601 - SSE2 / SSSE3 / SSE41")
+#define		DECLARE_AVG_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	BT709_CONVERSION,  pix_mult_count, height_mult_count, desc_str_prefix " - bt.709 - SSE2 / SSSE3 / SSE41")
+
 
 /*
  * The following macro declares the following conversion blocks:
@@ -182,17 +190,56 @@ DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, desc_str_p
 
 
 
+
+
+/*
+ * V210 conversion blocks (no SSE2 only conversions)
+ *
+ * The following macro declares the following conversion blocks:
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3/SSE41 full range
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3/SSE41 bt.601
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3/SSE41 bt.709
+ *
+ * - Average resampling SSE2/SSSE3/SSE41 full range
+ * - Average resampling SSE2/SSSE3/SSE41 bt.601
+ * - Average resampling SSE2/SSSE3/SSE41 bt.709
+ *
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 full range
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 bt.601
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 bt.709
+ *
+ * - Average resampling SSE2/SSSE3 full range
+ * - Average resampling SSE2/SSSE3 bt.601
+ * - Average resampling SSE2/SSSE3 bt.709
+ *
+ * - Fast Nearest NeighBour resampling NON-SSE full range
+ * - Fast Nearest NeighBour resampling NON-SSE bt.601
+ * - Fast Nearest NeighBour resampling NON-SSE bt.709
+ */
+#define		DECLARE_V210_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK		(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK	(convert_fn_prefix##_bt601, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK	(convert_fn_prefix##_bt709, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_SSE2_SSSE3_SSE41_CONV_BLOCK		(resample_n_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK	(resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK	(resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK				(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix##_bt601, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix##_bt709, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_SSE2_SSSE3_CONV_BLOCK				(resample_n_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix),\
+DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, desc_str_prefix),\
+DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, desc_str_prefix)
+
+
+
 /*
  * In this array, conversion blocks for a given pair of source and destination
  * formats must be sorted: fastest first, slowest last !!!
  */
 const struct  ConversionBlock		conversion_blocks[] = {
-	//DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
-	//DECLARE_NNB_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
-	//DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
-	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
-	//DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
-	//DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
 
 	//
 	// ARGB to YUYV
@@ -316,6 +363,21 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUV420P to BGR24
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_yuv420p_to_bgr24, convert_yuv420p_to_any_rgb, PixFcYUV420P, PixFcBGR24, 64, 2, "YUV420P to BGR24"),
+
+
+	//
+	// V210 to ARGB
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_argb, upsample_n_convert_v210_to_argb, convert_v210_to_any_rgb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
+
+	// V210 to BGRA
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgra, upsample_n_convert_v210_to_bgra, convert_v210_to_any_rgb, PixFcV210, PixFcBGRA, 48, 1, "v210 to BGRA"),
+
+	// V210 to RGB24
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_rgb24, upsample_n_convert_v210_to_rgb24, convert_v210_to_any_rgb, PixFcV210, PixFcRGB24, 48, 1, "v210 to RGB24"),
+
+	// V210 to BGR24
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgr24, upsample_n_convert_v210_to_bgr24, convert_v210_to_any_rgb, PixFcV210, PixFcBGR24, 48, 1, "v210 to BGR24"),
+
 };
 
 const uint32_t		conversion_blocks_count = sizeof(conversion_blocks) / sizeof(conversion_blocks[0]);

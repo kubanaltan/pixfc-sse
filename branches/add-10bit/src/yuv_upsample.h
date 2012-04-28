@@ -103,7 +103,7 @@ EXTERN_INLINE void	reconstruct_missing_uv_sse2(__m128i* current_uv, __m128i* nex
  * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
  */
 EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3(__m128i* current_uv, __m128i* out) {
-	CONST_M128I(shuff1, 0xFF0AFF08FF06FF04LL, 0xFF0EFF0CFF0EFF0CLL);
+	CONST_M128I(shuff1, 0x0B0A090807060504LL, 0x0F0E0D0C0F0E0D0CLL);
 	M128I(avgB, 0x0LL, 0x0LL);
 
 	_M(avgB) = _mm_shuffle_epi8(*current_uv, _M(shuff1));				// PSHUFB	1	0.5
@@ -129,8 +129,8 @@ EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3_sse41(__m128i* current
  * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
  */
 EXTERN_INLINE void	reconstruct_missing_uv_sse2_ssse3(__m128i* current_uv, __m128i* next_uv, __m128i* out) {
-	CONST_M128I(shuff1, 0xFF0AFF08FF06FF04LL, 0xFFFFFFFFFF0EFF0CLL);
-	CONST_M128I(shuff2, 0xFFFFFFFFFFFFFFFFLL, 0xFF02FF00FFFFFFFFLL);
+	CONST_M128I(shuff1, 0x0B0A090807060504LL, 0xFFFFFFFF0F0E0D0CLL);
+	CONST_M128I(shuff2, 0xFFFFFFFFFFFFFFFFLL, 0x03020100FFFFFFFFLL);
 	M128I(avgB, 0x0LL, 0x0LL);
 	M128I(tmp, 0x0LL, 0x0LL);
 

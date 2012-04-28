@@ -111,12 +111,12 @@ int 		main(int argc, char **argv) {
 		max_diff = atoi(argv[1]);
 
 	if (argc == 3) {
-		src_fmt = find_matching_pixel_format(argv[1]);
+		src_fmt = find_matching_pixel_format(argv[2]);
 		if (src_fmt != PixFcFormatCount)
 			printf("Using source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
 		else
 		{
-			printf("Unknown pixel format '%s'\n", argv[1]);
+			printf("Unknown pixel format '%s'\n", argv[2]);
 			exit(1);
 		}
 	}

@@ -99,7 +99,11 @@ typedef enum {
 	// (Using this flag implies PixFcFlag_NNbResamplingOnly).
 	PixFcFlag_NoSSE	=				(1 << 0),
 	// Force the use of a SSE2-only conversion routine
+	// (ie. exclude Non-SSE, SSSE3 and SSE41 conversion routines)
 	PixFcFlag_SSE2Only =			(1 << 1),
+	// Force the use of a SSE2 and SSSE3-only conversion routine
+	// (ie. exclude Non-SSE, SSE2-only and SSE41 conversion routines)
+	PixFcFlag_SSE2_SSSE3Only =			(1 << 2),
 
 	//
 	// By default, PixFC performs a full-range conversion, unless one of the

@@ -25,12 +25,13 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <strings.h>
 
 #include "pixfc-sse.h"
 
 // printf helper which prints file name and line number
 #define pixfc_log(fmt, ...) 	do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
-								__FILE__, __LINE__, ## __VA_ARGS__);\
+								rindex(__FILE__, '/')+1, __LINE__, ## __VA_ARGS__);\
 								fflush(stderr); } while(0)
 
 

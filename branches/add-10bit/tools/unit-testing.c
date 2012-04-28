@@ -169,7 +169,7 @@ static int			check_unaligned_conversions() {
 	struct PixFcSSE *				pixfc;
 	void *							input[2] = { NULL };	// 1 aligned & 1 unaligned input buffer
 	void *							output[2] = { NULL };	// 1 aligned & 1 unaligned output buffer
-	uint32_t						w = 64,	h = 2, index = 0;
+	uint32_t						w = 96,	h = 2, index = 0;
 
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
@@ -178,7 +178,7 @@ static int			check_unaligned_conversions() {
 			continue;
 		}
 
-		pixfc_log("%-80s\t", conversion_blocks[index].name);
+		pixfc_log("%-80s\n", conversion_blocks[index].name);
 
 		// Allocate the input & output buffers
 		if (allocate_aligned_buffer(pixfc->source_fmt, w, h, &input[0]) != 0) {
@@ -204,15 +204,15 @@ static int			check_unaligned_conversions() {
 
 		// Do conversion with aligned input & output buffers
 		pixfc->convert(pixfc, input[0], output[0]);
-		pixfc_log(".");
+		pixfc_log(".\n");
 
 		// Do conversion with aligned input & unaligned output buffers
 		pixfc->convert(pixfc, input[0], output[1]);
-		pixfc_log(".");
+		pixfc_log(".\n");
 
 		// Do conversion with unaligned input & aligned output buffers
 		pixfc->convert(pixfc, input[1], output[0]);
-		pixfc_log(".");
+		pixfc_log(".\n");
 
 		// Do conversion with unaligned input & output buffers
 		pixfc->convert(pixfc, input[1], output[1]);
@@ -232,7 +232,7 @@ static int			check_unaligned_conversions() {
 uint32_t		check_conversion_enumeration() {
 	uint32_t 			index;
 	struct PixFcSSE * 	pixfc = NULL;
-	uint32_t			w = 64, h = 2;
+	uint32_t			w = 96, h = 2;
 
 	for(index = 0; index < conversion_blocks_count; index++) {
 		pixfc_log("Checking '%s' ... \n", conversion_blocks[index].name);

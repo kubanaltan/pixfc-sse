@@ -84,8 +84,8 @@ const InputFile		input_files[] = {
 	},
 	{
 		PixFcV210,
-		960, 780,
-		NULL,
+		1920, 1080,
+		"1920x1080.v210",
 	},
 	{
 		PixFcARGB,
@@ -609,6 +609,8 @@ uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** p
 		flags |= PixFcFlag_NoSSE;
 	else if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_SSE2)
 		flags |= PixFcFlag_SSE2Only;
+	else if (conversion_blocks[index].required_cpu_features == (CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3))
+			flags |= PixFcFlag_SSE2_SSSE3Only;
 
 	if (conversion_blocks[index].attributes & BT601_CONVERSION)
 		flags |= PixFcFlag_BT601Conversion;

@@ -90,6 +90,12 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
+	// If we were told to use an SSE2 and SSSE3 routine, make sure that's the case
+	if ((flags & PixFcFlag_SSE2_SSSE3Only) && (block->required_cpu_features != (CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3))) {
+		dprint("Enforcing FORCE_SSE2_SSSE3_ONLY flag\n");
+		return PIXFC_CONVERSION_NOT_SUPPORTED;
+	}
+
 	// If the number of pixels is not multiple of the required value, error out.
 	if (conv->pixel_count % block->pixel_count_multiple != 0) {
 		dprint("Pixel count (%u) not multiple of %u\n", conv->pixel_count, block->pixel_count_multiple);
