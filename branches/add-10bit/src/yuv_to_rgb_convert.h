@@ -1927,7 +1927,7 @@ DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE1(convert_y_uv_vectors_to_rgb_vect
  * using BT601 YCbCr to RGB conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
- * Total latency: 			42 cycles
+ * Total latency: 			37 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1.164/4		0			1.596/4		]	( Y - 64 )
@@ -1985,7 +1985,7 @@ EXTERN_INLINE void convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601_sse2_sss
  * http://www.equasys.de/colorconversion.html
  *
  *
- * Total latency: 			42 cycles
+ * Total latency: 			37 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1.164/4		0			1.793/4		]	( Y - 64)
