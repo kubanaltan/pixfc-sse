@@ -538,11 +538,11 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	M128I(uv2, 0x0LL, 0x0LL);\
 	M128I(y3, 0x0LL, 0x0LL);\
 	M128I(uv3, 0x0LL, 0x0LL);\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[0], &y1, &uv1);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[0], &(_M(y1)), &(_M(uv1)));\
 	/* Y0		Y1		Y2		Y3		Y4		Y5		0		0 */\
 	/* U10		V10		U23		V23		U45		V45		0		0 */\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[1], &y2, &uv2);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[1], &(_M(y2)), &(_M(uv2)));\
 	/* Y6		Y7		Y8		Y9		Y10		Y11		0		0 */\
 	/* U67		V67		U89		V89		U1011	V1011	0		0 */\
 	\
@@ -561,7 +561,7 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	\
 	\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[2], &y3, &uv3);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[2], &(_M(y3)), &(_M(uv3)));\
 	/* Y12		Y13		Y14		Y15		Y16		Y17		0		0 */\
 	/* U1213	V1213	U1415	V1415	U1617	V1617	0		0 */\
 	\
@@ -581,7 +581,7 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	/* U1617	V1617	0		0		0		0		0		0 */\
 	\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[3], &y1, &uv1);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[3], &(_M(y1)), &(_M(uv1)));\
 	/* Y18		Y19		Y20		Y21		Y22		Y23		0		0 */\
 	/* U1819	V1819	U2021	V2021	U2223	V2223	0		0 */\
 	\
