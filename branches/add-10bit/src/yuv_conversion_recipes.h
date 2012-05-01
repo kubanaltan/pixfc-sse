@@ -665,13 +665,13 @@
 /*
  * Convert V210 to YUV422I
  */
-#define V210_TO_YUV422I_RECEIPE(pack_fn, instr_set) \
+#define V210_TO_YUV422I_RECIPE(pack_fn, instr_set) \
 	__m128i*	v210_in = (__m128i*) source_buffer;\
 	__m128i*	yuv_out = (__m128i*) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i		unpack_out[8];\
 	while(pixel_count > 0) {\
-		unpack_4v_v210_to_y_uv_vectors_##instr_set(v210_in, &unpack_out[0], , &unpack_out[2], &unpack_out[4]);\
+		unpack_4v_v210_to_y_uv_vectors_##instr_set(v210_in, &unpack_out[0], &unpack_out[2], &unpack_out[4]);\
 		v210_in += 4;\
 		unpack_out[0] = _mm_srai_epi16(unpack_out[0], 2);\
 		unpack_out[1] = _mm_srai_epi16(unpack_out[1], 2);\
@@ -681,7 +681,7 @@
 		yuv_out += 2;\
 		unpack_out[0] = _mm_srai_epi16(unpack_out[4], 2);\
 		unpack_out[1] = _mm_srai_epi16(unpack_out[5], 2);\
-		unpack_4v_v210_to_y_uv_vectors_##instr_set(v210_in, &unpack_out[2], , &unpack_out[4], &unpack_out[6]);\
+		unpack_4v_v210_to_y_uv_vectors_##instr_set(v210_in, &unpack_out[2], &unpack_out[4], &unpack_out[6]);\
 		v210_in += 4;\
 		unpack_out[2] = _mm_srai_epi16(unpack_out[2], 2);\
 		unpack_out[3] = _mm_srai_epi16(unpack_out[3], 2);\
