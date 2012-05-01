@@ -57,7 +57,7 @@ static int		do_scalar_image_conversion(PixFcPixelFormat src_fmt, PixFcPixelForma
 	struct PixFcSSE *	pixfc = NULL;
 
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, src_fmt, dest_fmt, w, h, PixFcFlag_NoSSE) != 0) {
+	if (create_pixfc(&pixfc, src_fmt, dest_fmt, w, h, ROW_SIZE(src_fmt, w), PixFcFlag_NoSSE) != 0) {
 		pixfc_log("Error create struct pixfc for scalar conversion\n");
 		return -1;
 	}
