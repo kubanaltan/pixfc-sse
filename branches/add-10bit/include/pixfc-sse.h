@@ -162,14 +162,20 @@ void			destroy_pixfc(struct PixFcSSE*);
  * Error codes
  */
 enum {
-	// Generic error code
-	PixFc_Error = -1,
+	// Source image has an invalid row size
+	PixFc_InvalidSourceImageRowSize = -5,
+	
+	// Source image dimensions prevent SSE conversions from being used.
+	PixFc_UnsupportedSourceImageDimension = -4,
+		
+	// Out of memory
+	PixFc_OOMError = -3, 
 	
 	// Conversion from source to destination format not supported
 	PixFc_UnsupportedConversionError = -2,
-	
-	// Out of memory
-	PixFc_OOMError = -3, 
+		
+	// Generic error code
+	PixFc_Error = -1,
 	
 	//
 	PixFc_OK = 0,

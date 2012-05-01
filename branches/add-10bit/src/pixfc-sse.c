@@ -91,22 +91,25 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PixFc_UnsupportedConversionError;
 	}
 	
+	//
+	// At this stage, we have found a conversion block which matches the flags given to us.
+	
 	// Check the bytes-per-row value
 	if (conv->row_bytes != ROW_SIZE(block->source_fmt, conv->width)) {
 		dprint("Skipping '%s' - Invalid row bytes %u - expected %d\n", block->name, conv->row_bytes, ROW_SIZE(block->source_fmt, conv->width));
-		return PixFc_UnsupportedConversionError;
+		return PixFc_InvalidSourceImageRowSize;
 	}
 
 	// If the number of pixels is not multiple of the required value, error out.
 	if (conv->pixel_count % block->pixel_count_multiple != 0) {
 		dprint("Skipping '%s' - Pixel count (%u) not multiple of %u\n", block->name, conv->pixel_count, block->pixel_count_multiple);
-		return PixFc_UnsupportedConversionError;
+		return PixFc_UnsupportedSourceImageDimension;
 	}
 
 	// If the height is not multiple of the required value, error out.
 	if (conv->pixel_count % block->height_multiple != 0) {
 		dprint("Skipping '%s' - Height (%u) not multiple of %u\n", block->name, conv->pixel_count, block->height_multiple);
-		return PixFc_UnsupportedConversionError;
+		return PixFc_UnsupportedSourceImageDimension;
 	}
 
 	dprint("Using '%s'\n", block->name);
@@ -125,6 +128,7 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 
 	uint32_t						index;
 	const struct ConversionBlock *	block;
+	uint32_t						result;
 
 	// Go over the array of conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
@@ -133,15 +137,19 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 		// destination formats and if the CPU has the required features.
 		block = &conversion_blocks[index];
 
-		if (block_matches_and_is_supported(conv, block, src_fmt, dest_fmt, flags) == PixFc_OK) {
+		result = block_matches_and_is_supported(conv, block, src_fmt, dest_fmt, flags);
+		if (result != PixFc_UnsupportedConversionError)
+		{
+			if (result == PixFc_OK) {
 
-			// We have a match, finish setting up the struct PixFcSSE
-			conv->convert = block->convert_fn;
-			conv->uses_sse = (block->required_cpu_features == CPUID_FEATURE_NONE) ? 0 : 1;
+				// We have a match, finish setting up the struct PixFcSSE
+				conv->convert = block->convert_fn;
+				conv->uses_sse = (block->required_cpu_features == CPUID_FEATURE_NONE) ? 0 : 1;
 
-			dprint("Found conversion block (uses SSE ? %s)\n", (conv->uses_sse == 1) ? "yes" : "no");
-
-			return PixFc_OK;
+				dprint("Found conversion block (uses SSE ? %s)\n", (conv->uses_sse == 1) ? "yes" : "no");
+			}
+			
+			return result;
 		}
 	}
 
