@@ -176,6 +176,8 @@ DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_
 /*
  * Repacking conversion blocks
  */
+#define		DECLARE_REPACK_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3_sse41,src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	DEFAULT_ATTRIBUTE, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix " - SSE2 / SSSE3 / SSE41")
 #define		DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
 DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3, 	DEFAULT_ATTRIBUTE, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix " - SSE2 / SSSE3")
 #define		DECLARE_REPACK_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
@@ -183,11 +185,17 @@ DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2, 		src_fmt, dst_fmt, 		CPUID_FEATURE
 #define		DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix)\
 DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 	DEFAULT_ATTRIBUTE, 1, 1, 1, desc_str_prefix " - NON SSE")
 
+// The following macro defines non-sse, sse2 and ssse3 repacking conversion blocks
 #define		DECLARE_REPACK_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
 DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_REPACK_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix)
 
+// The following macro defines non-sse, ssse3 and sse41 repacking conversion blocks
+#define		DECLARE_V210_REPACK_CONV_BLOCK(convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
+DECLARE_REPACK_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix)
 
 
 
@@ -258,7 +266,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// BGRA to YUYV
 	DECLARE_CONV_BLOCKS(convert_bgra_to_yuyv, downsample_n_convert_bgra_to_yuyv, convert_rgb_to_yuv422, PixFcBGRA, PixFcYUYV, 16, 1, 1, "BGRA to YUYV"),
 
-	// BGRA to UYVY
+	// BGRA to UYVYconvert_fn_prefix
 	DECLARE_CONV_BLOCKS(convert_bgra_to_uyvy, downsample_n_convert_bgra_to_uyvy, convert_rgb_to_yuv422, PixFcBGRA, PixFcUYVY, 16, 1, 1, "BGRA to UYVY"),
 
 	// BGRA to YUV422P
@@ -366,19 +374,25 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	//
-	// V210 to ARGB
+	// v210 to ARGB
 	DECLARE_V210_CONV_BLOCKS(convert_v210_to_argb, upsample_n_convert_v210_to_argb, convert_v210_to_any_rgb, PixFcV210, PixFcARGB, 1, 1, 48, "v210 to ARGB"),
 
-	// V210 to BGRA
+	// v210 to BGRA
 	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgra, upsample_n_convert_v210_to_bgra, convert_v210_to_any_rgb, PixFcV210, PixFcBGRA, 1, 1, 48, "v210 to BGRA"),
 
-	// V210 to RGB24
+	// v210 to RGB24
 	DECLARE_V210_CONV_BLOCKS(convert_v210_to_rgb24, upsample_n_convert_v210_to_rgb24, convert_v210_to_any_rgb, PixFcV210, PixFcRGB24, 1, 1, 48, "v210 to RGB24"),
 
-	// V210 to BGR24
+	// v210 to BGR24
 	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgr24, upsample_n_convert_v210_to_bgr24, convert_v210_to_any_rgb, PixFcV210, PixFcBGR24, 1, 1, 48, "v210 to BGR24"),
 
+	// v210 to YUYV
+	DECLARE_V210_REPACK_CONV_BLOCK(convert_v210_to_yuyv, convert_v210_to_yuv422i, PixFcV210, PixFcYUYV, 1, 1, 48, "v210 to YUYV"),
+
+	// v210 to UYVY
+	DECLARE_V210_REPACK_CONV_BLOCK(convert_v210_to_uyvy, convert_v210_to_yuv422i, PixFcV210, PixFcUYVY, 1, 1, 48, "v210 to UYVY"),
 };
+
 
 const uint32_t		conversion_blocks_count = sizeof(conversion_blocks) / sizeof(conversion_blocks[0]);
 

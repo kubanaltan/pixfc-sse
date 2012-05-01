@@ -188,18 +188,18 @@
 		}\
 	}
 
-#define DO_REPACK2(repack_macro, repack_fn, ...) \
+#define DO_REPACK2(repack_macro, unpack_fn_prefix, pack_fn, ...) \
 	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
-			repack_macro(repack_fn, __VA_ARGS__)\
+			repack_macro(unpack_fn_prefix, pack_fn, __VA_ARGS__)\
 		} else {\
-			repack_macro(unaligned_dst_##repack_fn, __VA_ARGS__)\
+			repack_macro(unpack_fn_prefix, unaligned_##pack_fn, __VA_ARGS__)\
 		}\
 	} else {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
-			repack_macro(unaligned_src_##repack_fn, __VA_ARGS__)\
+			repack_macro(unaligned_##unpack_fn_prefix, pack_fn, __VA_ARGS__)\
 		} else {\
-			repack_macro(unaligned_src_unaligned_dst_##repack_fn, __VA_ARGS__)\
+			repack_macro(unaligned_##unpack_fn_prefix, unaligned_##pack_fn, __VA_ARGS__)\
 		}\
 	}
 
