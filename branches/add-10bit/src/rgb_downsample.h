@@ -215,7 +215,7 @@ EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2(__m128i* in_3_v16i_r_g_
  */
 EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16i_r_g_b_vectors, __m128i *out_3_v16i_nnb_422_r_g_b_vectors)
 {
-	CONST_M128I(shuf_odd, 0xFF04FF04FF00FF00LL, 0xFF0CFF0CFF08FF08LL);
+	CONST_M128I(shuf_odd, 0x0504050401000100LL, 0x0D0C0D0C09080908LL);
 
 	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[0], _M(shuf_odd));// PSHUFB		1	0.5
 	// R1 0 R1 0	R3 0 R3	0	R5 0 R5	0	R7 0 R7 0
@@ -227,6 +227,10 @@ EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0
 }
 
+// No change for SSE41
+EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3_sse41(__m128i* in, __m128i *out) {
+	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(in, out);
+}
 
 /*
  * Theory behind the following 422 downsampling average filter is taken from:

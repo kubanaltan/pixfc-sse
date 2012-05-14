@@ -26,7 +26,7 @@
 
 #include <emmintrin.h>
 #include <tmmintrin.h>
-
+#include <smmintrin.h>
 
 #ifndef GENERATE_UNALIGNED_INLINES
 #error "The GENERATE_UNALIGNED_INLINES macro is not defined"
@@ -467,7 +467,7 @@ INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3_sse41, __m128i* inpu
  *
  *
  */
-INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3, __m128i* input, __m128i* out_y, __m128i* out_uv) {
+INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3, __m128i* input, __m128i* output) {
 	CONST_M128I(max_value, 0x03FF03FF03FF03FFLL, 0x03FF03FF03FF03FFLL);
 	CONST_M128I(shuffle_11, 0xFFFF0302FFFFFFFFLL, 0xFFFF0908FFFFFFFFLL);
 	CONST_M128I(shuffle_12, 0xFFFFFFFFFFFF0100LL, 0xFFFFFFFFFFFF0706LL);
@@ -534,13 +534,13 @@ INLINE_NAME(pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set, __m128i* input,
 	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, input, output);\
 	scratch[0] = _mm_alignr_epi8(input[2], input[0], 12);		/*	PALIGNR		1	1 */\
 	scratch[1] = _mm_alignr_epi8(input[3], input[1], 12);		/*	PALIGNR		1	1 */\
-	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, &(_M(scratch), &output[1]);\
+	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, scratch, &output[1]);\
 	scratch[0] = _mm_alignr_epi8(input[4], input[2], 8);		/*	PALIGNR		1	1 */\
 	scratch[1] = _mm_alignr_epi8(input[5], input[3], 8);		/*	PALIGNR		1	1 */\
-	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, &(_M(scratch), &output[2]);\
+	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, scratch, &output[2]);\
 	scratch[0] = _mm_srli_si128(input[4], 4);					/*	PSRLDQ		1	0.5 */\
 	scratch[1] = _mm_srli_si128(input[5], 4);					/*	PSRLDQ		1	0.5 */\
-	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, &(_M(scratch), &output[3]);\
+	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, scratch, &output[3]);\
 }
 
 /*
