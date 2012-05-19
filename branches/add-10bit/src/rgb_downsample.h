@@ -695,6 +695,11 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2(_
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
 
+	// Save current values in previous vectors
+	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
+	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
+	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
+
 	//
 	// As it is the first vector in the image and we dont have a sample at t = -1,
 	// we construct a vector of R samples at t = {0, 1, 3, 5}
@@ -779,11 +784,6 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2(_
 	// B1 0 xx 0	B3 0 xx 0	B5 0 B5 0	B7 0 B7 0
 	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
-
-	// Save current values in previous vectors
-	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
-	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
-	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 }
 
 
@@ -826,6 +826,11 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_s
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
+
+	// Save current values in previous vectors
+	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
+	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
+	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 
 	//
 	// As it is the first vector in the image and we dont have a sample at t = -1,
@@ -905,11 +910,6 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_s
 	// Duplicate samples at t = {0,2,4,6}
 	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shuffle_epi8(_M(scratch1),  _M(shuf_result));	// PSHUFB	1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
-
-	// Save current values in previous vectors
-	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
-	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
-	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 }
 
 
