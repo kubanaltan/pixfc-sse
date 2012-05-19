@@ -656,7 +656,10 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(_
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
 }
 
-
+// No change for SSE41
+EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3_sse41(__m128i* in_3_v16i_current_r_g_b_vectors, __m128i* in_3_v16i_previous_r_g_b_vectors, __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
+	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(in_3_v16i_current_r_g_b_vectors, in_3_v16i_previous_r_g_b_vectors, out_3_v16i_avg_422_r_g_b_vectors);
+}
 
 
 /*
@@ -912,6 +915,10 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_s
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
 }
 
+// No change for SSE41
+EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_ssse3_sse41(__m128i* in_3_v16i_current_r_g_b_vectors,  __m128i* out_3_previous_r_g_b_vectors, __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
+	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_ssse3(in_3_v16i_current_r_g_b_vectors,  out_3_previous_r_g_b_vectors, out_3_v16i_avg_422_r_g_b_vectors);
+}
 
 /*
  * Create 3 422 downsampled R, G, B vectors from 4 AG, RB vectors

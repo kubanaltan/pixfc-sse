@@ -127,6 +127,26 @@
 				convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
 				instr_set\
 		)
+
+#define CONVERT_TO_V210(instr_set)\
+		DO_CONVERSION_1U_1P(\
+				RGB32_TO_V210_RECIPE,\
+				unpack_argb_to_r_g_b_vectors_sse2_ssse3,\
+				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+				convert_r_g_b_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
+
+#define DOWNSAMPLE_N_CONVERT_TO_V210(instr_set)\
+		DO_CONVERSION_1U_1P(\
+				AVG_DOWNSAMPLE_RGB32_TO_V210_RECIPE,\
+				unpack_argb_to_r_g_b_vectors_sse2_ssse3,\
+				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+				convert_r_g_b_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 /*
  * We have 2 RGB to YUV422 conversion implementations:
  * - The first one unpacks 8 pixels into 3 16bit vectors R,G & B.
@@ -230,6 +250,17 @@ void		convert_argb_to_yuv420p_sse2_ssse3(const struct PixFcSSE *pixfc, void* sou
 // ARGB to YUV420P			SSE2
 void		convert_argb_to_yuv420p_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT2_TO_YUV420P(sse2);
+}
+
+
+// ARGB to V210				SSE2 SSSE3 SSE41
+void		convert_argb_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3_sse41);
+}
+
+// ARGB to V210				SSE2 SSSE3
+void		convert_argb_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3);
 }
 
 
