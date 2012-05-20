@@ -176,7 +176,7 @@
 	print_xmm8u("G 1-8:", &unpack_out[1]);\
 	print_xmm8u("B 1-8:", &unpack_out[2]);\
 	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm8u("Y1-8", convert_out[2]);\
+	print_xmm8u("Y1-8", &convert_out[2]);\
 	downsample2_fn(unpack_out, previous, downsample2_out);\
 	uv_conv_fn(downsample2_out, &convert_out[3]);\
 	print_xmm8u("UV1-4", &convert_out[3]);\
@@ -278,7 +278,7 @@
 	print_xmm16u("Previous AG (=5-8):", &previous[0]);\
 	print_xmm16u("Previous RB (=5-8):", &previous[1]);\
 	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Y1-8:", convert_out[2]);\
+	print_xmm16u("Y1-8:", &convert_out[2]);\
 	uv_conv_fn(downsample2_out, &convert_out[3]);\
 	print_xmm16u("UV1-4:", &convert_out[3]);\
 	rgb_in += 2;\
@@ -1285,10 +1285,10 @@
 	__m128i		unpack_out[3];\
 	__m128i		convert_out[6];\
 	while(pixel_count > 0) {\
-		RGB32_TO_YUV422_NNB_LOOP_CORE(\
-		unpack_fn,\
-		nnb_422_downsample_r_g_b_vectors_##instr_set,\
-		y_conv_fn, uv_conv_fn);\
+		RGB32_TO_V210_NNB_LOOP_CORE(\
+			unpack_fn,\
+			nnb_422_downsample_r_g_b_vectors_##instr_set,\
+			y_conv_fn, uv_conv_fn);\
 		pack_fn(convert_out, yuv_out);\
 		yuv_out += 4;\
 	};\
@@ -1311,7 +1311,7 @@
 	print_xmm8u("G 1-8:", &unpack_out[1]);\
 	print_xmm8u("B 1-8:", &unpack_out[2]);\
 	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm8u("Y1-8", convert_out[2]);\
+	print_xmm8u("Y1-8", &convert_out[2]);\
 	downsample2_fn(unpack_out, previous, downsample2_out);\
 	uv_conv_fn(downsample2_out, &convert_out[3]);\
 	print_xmm8u("UV1-4", &convert_out[3]);\
@@ -1321,7 +1321,7 @@
 	print_xmm8u("G 1-8:", &unpack_out[1]);\
 	print_xmm8u("B 1-8:", &unpack_out[2]);\
 	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm8u("Y1-8", convert_out[2]);\
+	print_xmm8u("Y1-8", &convert_out[2]);\
 	downsample2_fn(unpack_out, previous, downsample2_out);\
 	uv_conv_fn(downsample2_out, &convert_out[5]);\
 	print_xmm8u("UV1-4", &convert_out[5]);\
