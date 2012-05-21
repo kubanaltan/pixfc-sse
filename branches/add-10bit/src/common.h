@@ -32,6 +32,7 @@
 
 // Clamp a pixel component's value to 0-255
 #define CLIP_PIXEL(x) 		(((x)>255) ? 255 : ((x)<0) ? 0 : (x))
+#define CLIP_10BIT_PIXEL(x) (((x)>1023) ? 1023 : ((x)<0) ? 0 : (x))
 
 #ifdef __INTEL_CPU__
 

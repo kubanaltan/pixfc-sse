@@ -273,6 +273,24 @@ void		downsample_n_convert_argb_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc,
 
 
 // RGB to YUV422		NON SSE
+#define UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt) \
+	do {\
+		if (src_fmt == PixFcARGB) {\
+			src++; r1 = *(src++); g1 = *(src++); b1 = *(src++);\
+			src++; r2 = *(src++); g2 = *(src++); b2 = *(src++);\
+		} else if (src_fmt == PixFcBGRA) {\
+			b1 = *(src++); g1 = *(src++); r1 = *(src++); src++;\
+			b2 = *(src++); g2 = *(src++); r2 = *(src++); src++;\
+		} else if (src_fmt == PixFcRGB24) {\
+			r1 = *(src++); g1 = *(src++); b1 = *(src++);\
+			r2 = *(src++); g2 = *(src++); b2 = *(src++);\
+		} else if (src_fmt == PixFcBGR24) {\
+			b1 = *(src++); g1 = *(src++); r1 = *(src++);\
+			b2 = *(src++); g2 = *(src++); r2 = *(src++);\
+		} else\
+			printf("Unknown source pixel format in non-SSE conversion from RGB\n");\
+	}while(0)\
+
 void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void* out)
 {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
@@ -288,40 +306,7 @@ void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void*
 	int32_t				y1, y2, u, v;
 
 	while(pixel_num < pixel_count){
-		if (src_fmt == PixFcARGB) {
-			src++;	// A
-			r1 = *(src++);
-			g1 = *(src++);
-			b1 = *(src++);
-			src++;	// A
-			r2 = *(src++);
-			g2 = *(src++);
-			b2 = *(src++);
-		} else if (src_fmt == PixFcBGRA) {
-			b1 = *(src++);
-			g1 = *(src++);
-			r1 = *(src++);
-			src++;	// A
-			b2 = *(src++);
-			g2 = *(src++);
-			r2 = *(src++);
-			src++;	// A
-		} else if (src_fmt == PixFcRGB24) {
-			r1 = *(src++);
-			g1 = *(src++);
-			b1 = *(src++);
-			r2 = *(src++);
-			g2 = *(src++);
-			b2 = *(src++);
-		} else if (src_fmt == PixFcBGR24) {
-			b1 = *(src++);
-			g1 = *(src++);
-			r1 = *(src++);
-			b2 = *(src++);
-			g2 = *(src++);
-			r2 = *(src++);
-		} else
-			printf("Unknown source pixel format in non-SSE conversion from RGB\n");
+		UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);
 
 		//
 		y1 = (77 * r1 + 150 * g1 + 29 * b1) >> 8;
@@ -351,6 +336,57 @@ void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void*
 		pixel_num += 2;	// 2 pixels processed per loop
 	}
 }
+
+// RGB to v210		NON SSE
+
+#define 	DEFINE_ANY_RGB_TO_V210_FN(fn_name, y_offset, u_offset, v_offset, yr_coef, yg_coef, yb_coef, ur_coef, ug_coef, ub_coef, vr_coef, vg_coef, vb_coef) \
+	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out)\
+	{\
+		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
+		uint32_t 			pixel_num = 0;\
+		uint32_t			pixel_count = conv->pixel_count;\
+		uint8_t*			src = (uint8_t *) in;\
+		uint32_t*			dst = (uint32_t *) out;\
+		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
+		int32_t				y1, y2, u, v;\
+		while(pixel_num < pixel_count){\
+			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+			y1 = ((yr_coef * r1 + yg_coef * g1 + yb_coef * b1) >> 8) + y_offset;\
+			u = ((ur_coef * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+			v = ((vr_coef * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+			y2 = ((yr_coef * r2 + yg_coef * g2 + yb_coef * b2) >> 8) + y_offset;\
+			*dst = CLIP_10BIT_PIXEL(u) & 0x3FF;\
+			*dst |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 10;\
+			*(dst++) |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 20;\
+			*dst = CLIP_10BIT_PIXEL(y2) & 0x3FF;\
+			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+			y1 = ((yr_coef * r1 + yg_coef * g1 + yb_coef * b1) >> 8) + y_offset;\
+			u = ((ur_coef * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+			v = ((vr_coef * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+			y2 = ((yr_coef * r2 + yg_coef * g2 + yb_coef * b2) >> 8) + y_offset;\
+			*dst |= (CLIP_10BIT_PIXEL(u) & 0x3FF) << 10;\
+			*(dst++) |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 20;\
+			*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
+			*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
+			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+			y1 = ((yr_coef * r1 + yg_coef * g1 + yb_coef * b1) >> 8) + y_offset;\
+			u = ((ur_coef * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+			v = ((vr_coef * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+			y2 = ((yr_coef * r2 + yg_coef * g2 + yb_coef * b2) >> 8) + y_offset;\
+			*(dst++) |= (CLIP_10BIT_PIXEL(u) & 0x3FF) << 20;\
+			*dst = CLIP_10BIT_PIXEL(y1) & 0x3FF;\
+			*dst |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 10;\
+			*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 20;\
+			pixel_num += 6;\
+		}\
+	}\
+
+DEFINE_ANY_RGB_TO_V210_FN(convert_rgb_to_v210_nonsse,
+		0, 512, 512,
+		306, 601, 117,
+		-173, -339, 512,
+		512, -429, -83
+		)
 
 // RGB to YUV420		NON SSE
 #define 	DEFINE_ANY_RGB_TO_YUV420_FN(fn_name, y_offset, u_offset, v_offset, yr_coef, yg_coef, yb_coef, ur_coef, ug_coef, ub_coef, vr_coef, vg_coef, vb_coef) \
