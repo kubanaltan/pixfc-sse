@@ -421,14 +421,12 @@ INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3_sse41, __m128i* inpu
 	_M(scratch2) = _mm_shuffle_epi8(_M(scratch2), _M(shuffle_uv));					//	PSHUFB		1	0.5
 	//	U01		V01		0		U23		V23		U45		0		V45
 	
-	
 	//
 	_M(scratch3) = _mm_blendv_epi8(_M(scratch), _M(scratch2), _M(blend_mask1));		// PBLENDVB		1	1	
 	// U01		V01		Y1		Y2		V23		U45		Y4		Y5
 
-	_M(scratch2) = _mm_blendv_epi8(_M(scratch2), _M(scratch), _M(blend_mask1));		// PBLENDVB		1	1	
+	_M(scratch2) = _mm_blendv_epi8(_M(scratch2), _M(scratch), _M(blend_mask1));		// PBLENDVB		1	1
 	// 0		Y0		0		U23		0		Y3		0		V45
-	
 	
 	//
 	// 0		V01		0		Y2		0		U45		0		Y5	
@@ -437,12 +435,11 @@ INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3_sse41, __m128i* inpu
 	// (10-bit words)
 	// U01	0	V01		Y1	0	Y2		V23	0	U45		Y4	0	Y5
 	
-	
 	//
 	_M(scratch2) = _mm_srli_epi32(_M(scratch2), 6);									// PSRLD        1	1
 	M128_STORE(_mm_or_si128(_M(scratch), _M(scratch2)), *output);					// POR			1	0.33
 	// (10-bit words)
-	// U01	Y0	V01		Y1	U23	Y2		V23	Y3	U45		Y4	V45	Y5	
+	// U01	Y0	V01		Y1	U23	Y2		V23	Y3	U45		Y4	V45	Y5
 }
 
 /*
@@ -492,7 +489,6 @@ INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3, __m128i* input, __m
 
 	_M(scratch3) = _mm_or_si128(_M(scratch), _M(scratch2));			//	POR			1	0.33
 	//	U01		0		Y1		0		V23		0		Y4		0
-
 	
 	//
 	_M(scratch) = _mm_shuffle_epi8(input[0], _M(shuffle_21));		//	PSHUFB		1	0.5

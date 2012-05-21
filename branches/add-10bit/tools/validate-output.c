@@ -32,7 +32,17 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_DIFF	2
+static	PixFcPixelFormat		src_fmt = PixFcFormatCount;
+static	PixFcPixelFormat		dst_fmt = PixFcFormatCount;
+static  PixFcFlag				flags = PixFcFlag_Default;
+static	uint8_t					max_diff = 0;
+static const InputFile*			in_file = NULL;
+// In / out buffers
+static	__m128i	*				in = NULL;
+static	__m128i	*				out = NULL;	// buffer holding SSE converted data
+static	__m128i	*				out_scalar = NULL;// buffer holding scalar converted data for comparison
+
+
 
 //
 // Use the conversion block at the provided index to convert image of given width and height in in buffer to out buffer
@@ -91,26 +101,26 @@ static int		compare_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcP
 	return 0;
 }
 
-int 		main(int argc, char **argv) {
-	uint32_t				index;
-	const InputFile*		in_file = NULL;
-	PixFcPixelFormat		src_fmt = PixFcFormatCount;
-	uint8_t					max_diff = MAX_DIFF;
-	// In / out buffers
-	__m128i	*				in = NULL;
-	__m128i	*				out = NULL;	// buffer holding SSE converted data
-	__m128i	*				out_scalar = NULL;// buffer holding scalar converted data for comparison
-	
-	if (argc < 2) {
-		printf("Usage: %s threshold [ source pixel format]\n", argv[0]);
-		return 0;
+static void 	print_usage(char *prog_name) {
+	printf("Usage: %s threshold [<src_pix_fmt> <dest_pix_fmt> <flags>]\n", prog_name);
+	printf("Compare SSE conversion with scalar conversion, and stop if a difference\n");
+	printf("between two values is greater than the provided threshold.\n");
+	printf("Where <src_pix_fmt> and <dest_pix_fmt> are one of:\n");
+	print_known_pixel_formats();
+	printf("and flag is a bitmask from the following values:\n");
+	print_known_flags();
+}
+
+static void 		parse_args(int argc, char **argv) {
+	// Check and parse args
+	if ((argc != 2) && (argc != 5)) {
+		print_usage(argv[0]);
+		exit(1);
 	}
 
-	// Check if we should restrict to a single source format
-	if (argc >= 2)
-		max_diff = atoi(argv[1]);
+	max_diff = atoi(argv[1]);
 
-	if (argc == 3) {
+	if (argc == 5){
 		src_fmt = find_matching_pixel_format(argv[2]);
 		if (src_fmt != PixFcFormatCount)
 			printf("Using source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
@@ -119,101 +129,150 @@ int 		main(int argc, char **argv) {
 			printf("Unknown pixel format '%s'\n", argv[2]);
 			exit(1);
 		}
+
+		dst_fmt = find_matching_pixel_format(argv[3]);
+		if (dst_fmt != PixFcFormatCount)
+			printf("Using dest pixel format '%s'\n", pixfmt_descriptions[dst_fmt].name);
+		else
+		{
+			printf("Unknown pixel format '%s'\n", argv[3]);
+			exit(1);
+		}
+
+		flags = get_matching_flags(argv[4]);
+		printf("Using flags: ");
+		print_flags(flags);
 	}
+}
 
-	// Loop over all conversion blocks
-	for(index = 0; index < conversion_blocks_count; index++) {
-		// Check if we have to restrict to the specified source format
-		if ((src_fmt != PixFcFormatCount) && (src_fmt != conversion_blocks[index].source_fmt))
-			continue;
+static int 		setup_conversion_buffers() {
+	// If we have changed input format...
+	if (! in_file || (in_file->format != src_fmt)){
+		// Release previous image and load image in new format
+		ALIGN_FREE(in);
 		
-		// Make sure we skipped the scalar conversion routines
-		// (we dont want to compare them with themselves)
-		if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
-			continue;
-
-		// Make sure the CPU has the required features
-		if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
-			printf("  (skipped %s - CPU missing required features)\n",
-				   conversion_blocks[index].name);
-			continue;
+		in_file = find_input_file_for_format(src_fmt);
+		if (in_file == NULL) {
+			pixfc_log("Error looking for input file for format '%s'\n",
+				   pixfmt_descriptions[src_fmt].name);
+			return -1;
 		}
 		
-		// If we have changed input format...
-		if (! in_file || (in_file->format != conversion_blocks[index].source_fmt)){
-			// Release previous image and load image in new format
-			ALIGN_FREE(in);
-			
-			in_file = find_input_file_for_format(conversion_blocks[index].source_fmt);
-			if (in_file == NULL) {
-				pixfc_log("Error looking for input file for format '%s'\n",
-					   pixfmt_descriptions[conversion_blocks[index].source_fmt].name);
+		if (in_file->filename != NULL) {
+			char 	in_filename[128] = {0};
+			strcat(in_filename, PATH_TO_TEST_IMG);
+			strcat(in_filename, in_file->filename);
+
+			// Load buffer from specified file
+			if (get_buffer_from_file(src_fmt, in_file->width, in_file->height, in_filename, (void **)&in) < 0) {
+				pixfc_log("Error getting buffer from input file '%s'\n", in_file->filename);
+				return -1;
+			}
+		} else {
+			// no input file, assume its an RGB format
+			// try to generate the image from RGB buffer from GIMP
+
+			// allocate buffer
+			if (allocate_aligned_buffer(src_fmt, in_file->width, in_file->height, (void **) &in)){
+				pixfc_log("Error allocating memory\n");
+				return -1;
+			}
+			if (fill_argb_image_with_rgb_buffer(src_fmt, in_file->width, in_file->height, in) != 0) {
+				pixfc_log("Error getting buffer from RGB GIMP image\n");
 				return 1;
 			}
-			
-			if (in_file->filename != NULL) {
-				char 	in_filename[128] = {0};
-				strcat(in_filename, PATH_TO_TEST_IMG);
-				strcat(in_filename, in_file->filename);
+		}
+	}
 
-				// Load buffer from specified file
-				if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_filename, (void **)&in) < 0) {
-					pixfc_log("Error getting buffer from input file '%s'\n", in_file->filename);
-					return 1;
-				}
-			} else {
-				// no input file, assume its an RGB format
-				// try to generate the image from RGB buffer from GIMP
+	// Release previous output buffers and create new ones
+	ALIGN_FREE(out);
+	ALIGN_FREE(out_scalar);
 
-				// allocate buffer
-				if (allocate_aligned_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, (void **) &in)){
-					pixfc_log("Error allocating memory\n");
-					return -1;
-				}
-				if (fill_argb_image_with_rgb_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in) != 0) {
-					pixfc_log("Error getting buffer from RGB GIMP image\n");
-					return 1;
-				}
+	if (allocate_aligned_buffer(dst_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
+		pixfc_log("Error allocating output buffer");
+		return -1;
+	}
+
+	if (allocate_aligned_buffer(dst_fmt, in_file->width, in_file->height, (void **)&out_scalar) != 0) {
+		pixfc_log("Error allocating scalar output buffer");
+		return -1;
+	}
+
+	return 0;
+}
+static int		check_conversion_block(uint32_t index) {
+	printf("%-60s %dx%d\n", conversion_blocks[index].name, in_file->width, in_file->height);
+
+	// Do SSE conversion
+	if (do_image_conversion(index, in, out, in_file->width, in_file->height) != 0)
+		return -1;
+
+	// Do scalar conversion
+	if (do_scalar_image_conversion(src_fmt, dst_fmt, in, out_scalar, in_file->width, in_file->height) != 0)
+		return -1;
+
+	// Compare the two output buffers
+	if (compare_output_buffers((uint8_t*)out, (uint8_t*)out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
+		return 1;
+	}
+
+	return 0;
+}
+
+int 			main(int argc, char **argv) {
+	uint32_t				index;
+
+	// Parse args
+	parse_args(argc, argv);
+
+	// Check if we have to restrict to a specified source & dest formats
+	if (src_fmt != PixFcFormatCount) {
+		if (setup_conversion_buffers() == 0) {
+			int32_t index;
+
+			index = find_conversion_block_index(src_fmt, dst_fmt, flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width));
+			if (index != -1)
+				check_conversion_block(index);
+			else
+				printf("Cant find conversion block to do this conversion\n");
+		} else
+			printf("Error setting up conversion buffers\n");
+	} else {
+		// Loop over all conversion blocks
+		for(index = 0; index < conversion_blocks_count; index++) {
+
+			// Make sure we skipped the scalar conversion routines
+			// (we dont want to compare them with themselves)
+			if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
+				continue;
+
+			// Make sure the CPU has the required features
+			if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
+				printf("  (skipped %s - CPU missing required features)\n",
+					   conversion_blocks[index].name);
+				continue;
 			}
-		}
-		
-		// Release previous output buffers and create new ones
-		ALIGN_FREE(out);
-		ALIGN_FREE(out_scalar);
-		
-		if (allocate_aligned_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
-			pixfc_log("Error allocating output buffer");
-			return 1;
-		}
 
-		if (allocate_aligned_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out_scalar) != 0) {
-			pixfc_log("Error allocating scalar output buffer");
-			return 1;
-		}
+			src_fmt = conversion_blocks[index].source_fmt;
+			dst_fmt = conversion_blocks[index].dest_fmt;
 
-		printf("%-60s %dx%d\n", conversion_blocks[index].name, in_file->width, in_file->height);
-		
-		// Do SSE conversion
-		if (do_image_conversion(index, in, out, in_file->width, in_file->height) != 0)
-			return -1;
-		
-		// Do scalar conversion
-		if (do_scalar_image_conversion(conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, in, out_scalar, in_file->width, in_file->height) != 0)
-			return -1;
+			if (setup_conversion_buffers() != 0) {
+				printf("Error setting up conversion buffers\n");
+				break;
+			}
 
-		// Compare the two output buffers
-		if (compare_output_buffers((uint8_t*)out, (uint8_t*)out_scalar, conversion_blocks[index].dest_fmt, in_file->width, in_file->height, max_diff) != 0) {
-			break;
+			if (check_conversion_block(index) != 0)
+				break;
+
+			// Add a blank line if the next conversion block uses different
+			// source or destinaton format
+			if (((index + 1) < conversion_blocks_count)
+				&& ((conversion_blocks[(index + 1)].source_fmt !=
+					 conversion_blocks[index].source_fmt)
+					|| (conversion_blocks[(index + 1)].dest_fmt !=
+						conversion_blocks[index].dest_fmt)))
+				printf("\n");
 		}
-		
-		// Add a blank line if the next conversion block uses different
-		// source or destinaton format
-		if (((index + 1) < conversion_blocks_count)
-			&& ((conversion_blocks[(index + 1)].source_fmt !=
-				 conversion_blocks[index].source_fmt)
-				|| (conversion_blocks[(index + 1)].dest_fmt !=
-					conversion_blocks[index].dest_fmt)))
-			printf("\n");
 	}
 	
 	ALIGN_FREE(in);

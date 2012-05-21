@@ -133,8 +133,8 @@
 				RGB32_TO_V210_RECIPE,\
 				unpack_argb_to_r_g_b_vectors_sse2_ssse3,\
 				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
-				convert_r_g_b_vectors_to_y_vector_sse2,\
-				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				convert_8bit_r_g_b_vectors_to_10bit_y_vector_sse2,\
+				convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_sse2,\
 				instr_set\
 		)
 
@@ -143,8 +143,8 @@
 				AVG_DOWNSAMPLE_RGB32_TO_V210_RECIPE,\
 				unpack_argb_to_r_g_b_vectors_sse2_ssse3,\
 				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
-				convert_r_g_b_vectors_to_y_vector_sse2,\
-				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				convert_8bit_r_g_b_vectors_to_10bit_y_vector_sse2,\
+				convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_sse2,\
 				instr_set\
 		)
 /*
@@ -258,9 +258,17 @@ void		convert_argb_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* 
 	CONVERT_TO_V210(sse2_ssse3_sse41);
 }
 
+void		downsample_n_convert_argb_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3_sse41);
+}
+
 // ARGB to V210				SSE2 SSSE3
 void		convert_argb_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_V210(sse2_ssse3);
+}
+
+void		downsample_n_convert_argb_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3);
 }
 
 
