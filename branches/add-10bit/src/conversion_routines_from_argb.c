@@ -291,51 +291,51 @@ void		downsample_n_convert_argb_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc,
 			printf("Unknown source pixel format in non-SSE conversion from RGB\n");\
 	}while(0)\
 
-void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void* out)
-{
-	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	PixFcPixelFormat 	src_fmt = conv->source_fmt;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			src = (uint8_t *) in;
-	uint8_t*			dst = (uint8_t *) out;
-	uint8_t*			y_plane = dst;
-	uint8_t*			u_plane = dst + pixel_count;
-	uint8_t*			v_plane = u_plane + pixel_count / 2;
-	int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;
-	int32_t				y1, y2, u, v;
 
-	while(pixel_num < pixel_count){
-		UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);
+#define 	DEFINE_ANY_RGB_TO_YUV422(fn_name, y_offset, u_offset, v_offset, yr_coef, yg_coef, yb_coef, ur_coef, ug_coef, ub_coef, vr_coef, vg_coef, vb_coef) \
+	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
+		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
+		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
+		uint32_t 			pixel_num = 0;\
+		uint32_t			pixel_count = conv->pixel_count;\
+		uint8_t*			src = (uint8_t *) in;\
+		uint8_t*			dst = (uint8_t *) out;\
+		uint8_t*			y_plane = dst;\
+		uint8_t*			u_plane = dst + pixel_count;\
+		uint8_t*			v_plane = u_plane + pixel_count / 2;\
+		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
+		int32_t				y1, y2, u, v;\
+		while(pixel_num < pixel_count){\
+			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+			y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
+			u =  (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+			v =  (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+			y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
+			if (dest_fmt == PixFcYUYV) {\
+				*(dst++) = CLIP_PIXEL(y1);\
+				*(dst++) = CLIP_PIXEL(u);\
+				*(dst++) = CLIP_PIXEL(y2);\
+				*(dst++) = CLIP_PIXEL(v);\
+			} else if (dest_fmt == PixFcUYVY) {\
+				*(dst++) = CLIP_PIXEL(u);\
+				*(dst++) = CLIP_PIXEL(y1);\
+				*(dst++) = CLIP_PIXEL(v);\
+				*(dst++) = CLIP_PIXEL(y2);\
+			} else if (dest_fmt == PixFcYUV422P) {\
+				*(y_plane++) = CLIP_PIXEL(y1);\
+				*(y_plane++) = CLIP_PIXEL(y2);\
+				*(u_plane++) = CLIP_PIXEL(u);\
+				*(v_plane++) = CLIP_PIXEL(v);\
+			} else {\
+				printf("Unknown output format in non-SSE conversion from RGB\n");\
+			}\
+			pixel_num += 2;\
+		}\
+	}\
 
-		//
-		y1 = (77 * r1 + 150 * g1 + 29 * b1) >> 8;
-		u = ((-43 * r1 - 85 * g1 + 128 * b1) >> 8) + 128;
-		v = ((128 * r1 - 107  * g1 - 21 * b1) >> 8) + 128;
-		y2 = (77 * r2 + 150 * g2 + 29 * b2) >> 8;
-
-		if (dest_fmt == PixFcYUYV) {
-			*(dst++) = CLIP_PIXEL(y1);
-			*(dst++) = CLIP_PIXEL(u);
-			*(dst++) = CLIP_PIXEL(y2);
-			*(dst++) = CLIP_PIXEL(v);
-		} else if (dest_fmt == PixFcUYVY) {
-			*(dst++) = CLIP_PIXEL(u);
-			*(dst++) = CLIP_PIXEL(y1);
-			*(dst++) = CLIP_PIXEL(v);
-			*(dst++) = CLIP_PIXEL(y2);
-		} else if (dest_fmt == PixFcYUV422P) {
-			*(y_plane++) = CLIP_PIXEL(y1);
-			*(y_plane++) = CLIP_PIXEL(y2);
-			*(u_plane++) = CLIP_PIXEL(u);
-			*(v_plane++) = CLIP_PIXEL(v);
-		} else {
-			printf("Unknown output format in non-SSE conversion from RGB\n");
-		}
-
-		pixel_num += 2;	// 2 pixels processed per loop
-	}
-}
+DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_nonsse, 0, 128, 128, 77, 150, 29, -43, -85, 128, 128, -107, -21)
+DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt601_nonsse, 16, 128, 128, 66, 129, 25, -38, -74, 112, 112, -94, -18)
+DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt709_nonsse, 16, 128, 128, 47, 157, 16, -26, -87, 112, 112, -102, -10)
 
 // RGB to v210		NON SSE
 
