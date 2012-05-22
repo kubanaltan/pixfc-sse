@@ -135,6 +135,10 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
 void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * buffer);
 
 /*
+ * Write buffer as is to a file
+ */
+void 		write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in);
+/*
  *  This function returns the current system's uptime
  *  in nanoseconds (64 bit unsigned)
  */

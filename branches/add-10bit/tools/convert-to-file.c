@@ -41,8 +41,6 @@ uint32_t				h = 1024;
 PixFcFlag				flags = PixFcFlag_Default;
 
 static void 		print_usage(char *prog_name) {
-	uint32_t index = 0;
-
 	printf("Convert an image in a source pixel format to a destination pixel format.\n");
 	printf("Usage: %s <input format> [input file] <output format> <width> <height> <flags>\n", prog_name);
 	printf("Where <input format> and <output format> are one of:\n");

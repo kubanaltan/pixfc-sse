@@ -90,6 +90,7 @@ const InputFile		input_files[] = {
 	{
 		PixFcARGB,
 		1920, 1080,
+		//48,1,
 		NULL,
 	},
 	{
@@ -615,7 +616,7 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 
 	pixfc_log("done\n");
 }
-static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in) {
+void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in) {
 	int32_t			fd;
 	uint32_t		count = 0;
 	uint8_t			*buffer = (uint8_t *) in;

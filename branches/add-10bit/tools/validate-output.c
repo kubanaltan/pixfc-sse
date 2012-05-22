@@ -80,10 +80,9 @@ static int		do_scalar_image_conversion(PixFcPixelFormat src_fmt, PixFcPixelForma
 	return 0;
 }
 
-static int		compare_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
+static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
 	uint32_t i;
 	uint32_t buffer_size = IMG_SIZE(fmt, width, height);
-	uint32_t bytes_per_row = width * pixfmt_descriptions[fmt].bytes_per_pix_num / pixfmt_descriptions[fmt].bytes_per_pix_denom;
 	uint8_t* sse_start = out_sse;
 	for(i = 0; i < buffer_size; i++) {
 		if(abs(*out_scalar - *out_sse) > max_diff) {
@@ -99,6 +98,90 @@ static int		compare_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcP
 	}
 
 	return 0;
+}
+
+#define COMPARE_VALUES(component)\
+	if(abs(scalar_val - sse_val) > max_diff) {\
+		printf(component " @ Pixel %ux%u (offset: %llu) differ by %u : SSE: %hhu - Scalar: %hhu\n",\
+		(pixel + 1), line,\
+		(unsigned long long)((sse_ptr - out_sse) * 4),\
+		abs(scalar_val - sse_val), sse_val, scalar_val);\
+		return -1;\
+	}
+static int		compare_v210_output_buffers(uint32_t* out_sse, uint32_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
+	uint32_t line = 0;
+	uint32_t pixel = 0;
+	uint32_t bytes_per_row = ROW_SIZE(fmt,  width);
+	uint32_t* scalar_ptr = out_scalar;
+	uint32_t* sse_ptr = out_sse;
+	uint16_t scalar_val;
+	uint16_t sse_val;
+	while(line++ < height) {
+		while(pixel < width){
+			scalar_val = (*scalar_ptr & 0x3FF);
+			sse_val = (*sse_ptr & 0x3ff);
+			COMPARE_VALUES("U");
+
+			scalar_val = ((*scalar_ptr >> 10) & 0x3FF);
+			sse_val = ((*sse_ptr >> 10) & 0x3ff);
+			COMPARE_VALUES("Y1");
+
+			scalar_val = ((*scalar_ptr++ >> 20) & 0x3FF);
+			sse_val = ((*sse_ptr++ >> 20) & 0x3ff);
+			COMPARE_VALUES("V");
+
+			scalar_val = (*scalar_ptr & 0x3FF);
+			sse_val = (*sse_ptr & 0x3ff);
+			COMPARE_VALUES("Y2");
+
+			scalar_val = ((*scalar_ptr >> 10) & 0x3FF);
+			sse_val = ((*sse_ptr >> 10) & 0x3ff);
+			COMPARE_VALUES("U");
+
+			scalar_val = ((*scalar_ptr++ >> 20) & 0x3FF);
+			sse_val = ((*sse_ptr++ >> 20) & 0x3ff);
+			COMPARE_VALUES("Y3");
+
+			scalar_val = (*scalar_ptr & 0x3FF);
+			sse_val = (*sse_ptr & 0x3ff);
+			COMPARE_VALUES("V");
+
+			scalar_val = ((*scalar_ptr >> 10) & 0x3FF);
+			sse_val = ((*sse_ptr >> 10) & 0x3ff);
+			COMPARE_VALUES("Y4");
+
+			scalar_val = ((*scalar_ptr++ >> 20) & 0x3FF);
+			sse_val = ((*sse_ptr++ >> 20) & 0x3ff);
+			COMPARE_VALUES("U");
+
+			scalar_val = (*scalar_ptr & 0x3FF);
+			sse_val = (*sse_ptr & 0x3ff);
+			COMPARE_VALUES("Y5");
+
+			scalar_val = ((*scalar_ptr >> 10) & 0x3FF);
+			sse_val = ((*sse_ptr >> 10) & 0x3ff);
+			COMPARE_VALUES("V");
+
+			scalar_val = ((*scalar_ptr++ >> 20) & 0x3FF);
+			sse_val = ((*sse_ptr++ >> 20) & 0x3ff);
+			COMPARE_VALUES("Y6");
+
+			pixel += 6;
+		}
+		scalar_ptr = out_scalar + line * bytes_per_row / 4;
+		sse_ptr = out_sse + line * bytes_per_row / 4;
+		pixel = 0;
+	}
+
+	return 0;
+}
+
+
+static int		compare_output_buffers(void* out_sse, void* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
+	if (fmt == PixFcV210)
+		return compare_v210_output_buffers((uint32_t*)out_sse, (uint32_t*)out_scalar, fmt, width, height, max_diff);
+	else
+		return compare_8bit_output_buffers((uint8_t*)out_sse, (uint8_t*)out_scalar, fmt, width, height, max_diff);
 }
 
 static void 	print_usage(char *prog_name) {
@@ -177,10 +260,8 @@ static int 		setup_conversion_buffers() {
 				pixfc_log("Error allocating memory\n");
 				return -1;
 			}
-			if (fill_argb_image_with_rgb_buffer(src_fmt, in_file->width, in_file->height, in) != 0) {
-				pixfc_log("Error getting buffer from RGB GIMP image\n");
-				return 1;
-			}
+			if (fill_argb_image_with_rgb_buffer(src_fmt, in_file->width, in_file->height, in) != 0)
+				fill_image(src_fmt, IMG_SIZE(src_fmt, in_file->width, in_file->height), in);
 		}
 	}
 
@@ -212,7 +293,10 @@ static int		check_conversion_block(uint32_t index) {
 		return -1;
 
 	// Compare the two output buffers
-	if (compare_output_buffers((uint8_t*)out, (uint8_t*)out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
+	if (compare_output_buffers(out, out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
+		printf("Dumping scalar and sse buffers for inspection.\n");
+		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, "sse_buffer.raw", out);
+		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, "scalar_buffer.raw", out_scalar);
 		return 1;
 	}
 
