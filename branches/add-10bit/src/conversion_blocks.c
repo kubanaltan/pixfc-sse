@@ -279,6 +279,10 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// BGRA to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_bgra_to_yuv420p, convert_rgb_to_yuv420, PixFcBGRA, PixFcYUV420P, 64, 2, 1, "BGRA to YUV420P"),
 
+	// BGRA to v210
+	DECLARE_V210_CONV_BLOCKS(convert_bgra_to_v210, downsample_n_convert_bgra_to_v210, convert_rgb_to_v210, PixFcBGRA, PixFcV210, 1, 1, 48, "BGRA to v210"),
+
+
 	//
 	// RGB24 to YUYV
 	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuyv, downsample_n_convert_rgb24_to_yuyv, convert_rgb_to_yuv422, PixFcRGB24, PixFcYUYV, 16, 1, 1, "RGB24 to YUYV"),
@@ -292,7 +296,10 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// RGB24 to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_rgb24_to_yuv420p, convert_rgb_to_yuv420, PixFcRGB24, PixFcYUV420P, 64, 2, 1, "RGB24 to YUV420P"),
 
-	
+	// RGB24 to v210
+	DECLARE_V210_CONV_BLOCKS(convert_rgb24_to_v210, downsample_n_convert_rgb24_to_v210, convert_rgb_to_v210, PixFcRGB24, PixFcV210, 1, 1, 48, "RGB24 to v210"),
+
+
 	//
 	// BGR24 to YUYV
 	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuyv, downsample_n_convert_bgr24_to_yuyv, convert_rgb_to_yuv422, PixFcBGR24, PixFcYUYV, 16, 1, 1, "BGR24 to YUYV"),
@@ -305,6 +312,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// BGR24 to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_bgr24_to_yuv420p, convert_rgb_to_yuv420, PixFcBGR24, PixFcYUV420P, 64, 2, 1, "BGR24 to YUV420P"),
+
+	// BGR24 to v210
+	DECLARE_V210_CONV_BLOCKS(convert_bgr24_to_v210, downsample_n_convert_bgr24_to_v210, convert_rgb_to_v210, PixFcBGR24, PixFcV210, 1, 1, 48, "BGR24 to v210"),
 
 
 	//
