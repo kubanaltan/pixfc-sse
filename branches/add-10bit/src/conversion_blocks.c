@@ -252,6 +252,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	DECLARE_AVG_SSE2_SSSE3_CONV_BLOCK(downsample_n_convert_argb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
 	DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_argb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
 	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_argb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
+	DECLARE_NNB_CONV_BLOCK(convert_rgb_to_v210, PixFcARGB, PixFcV210, "ARGB to v210"),
 
 	//
 	// ARGB to YUYV

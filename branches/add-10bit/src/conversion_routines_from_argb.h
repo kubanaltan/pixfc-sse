@@ -186,6 +186,11 @@ void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void*
 void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out);
 void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out);
 
+// RGB to V210		NON SSE
+void 		convert_rgb_to_v210_nonsse(const struct PixFcSSE* conv, void* in, void* out);
+void 		convert_rgb_to_v210_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out);
+void 		convert_rgb_to_v210_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out);
+
 // RGB to YUV420		NON SSE
 void 		convert_rgb_to_yuv420_nonsse(const struct PixFcSSE* conv, void* in, void* out);
 void 		convert_rgb_to_yuv420_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out);
