@@ -248,11 +248,6 @@ DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_
  * formats must be sorted: fastest first, slowest last !!!
  */
 const struct  ConversionBlock		conversion_blocks[] = {
-	DECLARE_AVG_SSE2_SSSE3_SSE41_CONV_BLOCK(downsample_n_convert_argb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
-	DECLARE_AVG_SSE2_SSSE3_CONV_BLOCK(downsample_n_convert_argb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
-	DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_argb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
-	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_argb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
-	DECLARE_NNB_CONV_BLOCK(convert_rgb_to_v210, PixFcARGB, PixFcV210, "ARGB to v210"),
 
 	//
 	// ARGB to YUYV
@@ -266,6 +261,10 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// ARGB to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_argb_to_yuv420p, convert_rgb_to_yuv420, PixFcARGB, PixFcYUV420P, 64, 2, 1, "ARGB to YUV420P"),
+
+	// ARGB to v210
+	DECLARE_V210_CONV_BLOCKS(convert_argb_to_v210, downsample_n_convert_argb_to_v210, convert_rgb_to_v210, PixFcARGB, PixFcV210, 1, 1, 48, "ARGB to v210"),
+
 
 	//
 	// BGRA to YUYV
