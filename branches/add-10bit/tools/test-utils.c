@@ -659,7 +659,8 @@ void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t heigh
 
 
 uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pixfc, uint32_t width, uint32_t height) {
-	uint32_t			flags = PixFcFlag_Default;
+	uint32_t	flags = PixFcFlag_Default;
+	uint32_t	result;
 
 	// Index valid ?
 	if (index >= conversion_blocks_count) {
@@ -691,8 +692,9 @@ uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pix
 		flags |= PixFcFlag_BT709Conversion;
 
 	// Create struct pixfc for this conversion block
-	if (create_pixfc(pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, ROW_SIZE(conversion_blocks[index].source_fmt, width), flags) != 0) {
-		pixfc_log("Error create struct pixfc for conversion '%s' %ux%u\n", conversion_blocks[index].name, width, height);
+	result = create_pixfc(pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, ROW_SIZE(conversion_blocks[index].source_fmt, width), flags);
+	if (result != 0) {
+		pixfc_log("Error (%d) creating struct pixfc for conversion '%s' %ux%u\n", result, conversion_blocks[index].name, width, height);
 		return -3;
 	}
 
