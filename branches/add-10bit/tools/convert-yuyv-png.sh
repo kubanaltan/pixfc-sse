@@ -2,7 +2,7 @@
 
 if [ $# -ne 1 -a $# -ne 2 ]; then
 	echo "Usage: $0 <yuv_in_format> [filename]"
-	echo "where 'yuv_in_format' is either YUYV, UYVY, YUV422p or YUV420p"
+	echo "where 'yuv_in_format' is either YUYV, UYVY, YUV422p, YUV420p or v210"
 	echo "Input files must also bear that extension"
 	echo "If 'filename' is specified, only this file will be converted"
 	exit 1
@@ -37,10 +37,21 @@ elif [ "${ext}" = "YUV422p" ]; then
 	
 	# Ensure yuv422p_to_yuyv exists, otherwise build it
 	if [ ! -x "$(dirname $0)/yuv422p_to_yuyv" ]; then
-		gcc "$(dirname $0)/yuv422p_to_yuyv.c" -o "$(dirname $0)/yuv422p_to_yuyv"
+		gcc "$(dirname $0)/yuv422p_to_yuyv.c" -O3 -o "$(dirname $0)/yuv422p_to_yuyv"
 	fi  
 	cmd="$(dirname $0)/yuv422p_to_yuyv WIDTH HEIGHT"
 	cmd2="mplayer -demuxer rawvideo -rawvideo format=yuy2:w=WIDTH:h=HEIGHT -vo png:z=0 output.YUYV"
+elif [ "${ext}" = "v210" ]; then
+	# Do the conversion in 2 steps: to yuyv first using one of our tool
+	# then to png using mplayer
+	
+	# Ensure v210_to_yuyv exists, otherwise build it
+	if [ ! -x "$(dirname $0)/v210_to_yuyv" ]; then
+		gcc "$(dirname $0)/v210_to_yuyv.c" -O3 -o "$(dirname $0)/v210_to_yuyv"
+	fi  
+	cmd="$(dirname $0)/v210_to_yuyv WIDTH HEIGHT"
+	cmd2="mplayer -demuxer rawvideo -rawvideo format=yuy2:w=WIDTH:h=HEIGHT -vo png:z=0 output.YUYV"
+
 elif [ "${ext}" = "YUV420p" ]; then
 	cmd="mplayer -demuxer rawvideo -rawvideo format=i420:w=WIDTH:h=HEIGHT -vo png:z=0"
 else
