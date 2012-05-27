@@ -93,6 +93,11 @@ extern const uint32_t					pixfmt_descriptions_count;
 			pixfmt_descriptions[(fmt)].bytes_per_pix_num * pixfmt_descriptions[(fmt)].row_pixel_multiple / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
 	)
 
+#define PADDING_SIZE(fmt, width) \
+	(\
+			ROW_SIZE((fmt), (width)) - (width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
+	)
+
 /*
  * This macro expands to the size in bytes of an image of the given width and 
  * height in the given pixel format (of type PixFcPixelFormat).

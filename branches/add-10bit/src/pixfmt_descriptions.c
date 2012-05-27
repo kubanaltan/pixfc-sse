@@ -214,10 +214,10 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 				// 1 red pix - 1 black pix - 1 white pix - 1 green pix
 		    	// 1 bordeaux pix - 1 blue pix - 1 grey pix - 1 red pix
-				_E(0x000000000000FF00LL, 0x00FF0000FFFFFF00LL),
-				_E(0xFF00000000005100LL, 0x0000FF0088888800LL)
+				//_E(0x000000000000FF00LL, 0x00FF0000FFFFFF00LL),
+				//_E(0xFF00000000005100LL, 0x0000FF0088888800LL)
 			},
-			4,
+			2,
 		    "ARGB",
 	},
 
