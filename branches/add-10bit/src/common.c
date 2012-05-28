@@ -78,7 +78,7 @@ INLINE uint64_t		get_cpu_features() {
 
 
 #ifdef DEBUG
-#if 1
+#if 0
 void print_xmm32(char *name, __m128i *reg) {
 	// print register as 16bit signed
 	int32_t*	array = (int32_t *)reg;
