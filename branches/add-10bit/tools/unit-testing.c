@@ -449,25 +449,25 @@ static uint32_t check_v210_conversion_buffer_sizes() {
 	for(conv_index = 0; conv_index < conversion_blocks_count; conv_index++) {
 		if ((conversion_blocks[conv_index].width_multiple == 16) && (conversion_blocks[conv_index].height_multiple == 1)) {
 			width_array = w_16_1;
-			height_array = w_16_1;
+			height_array = h_16_1;
 			array_size = size_count_16_1;
 		} else if ((conversion_blocks[conv_index].width_multiple == 32) && (conversion_blocks[conv_index].height_multiple == 1)) {
 			width_array = w_32_1;
-			height_array = w_32_1;
+			height_array = h_32_1;
 			array_size = size_count_32_1;
 		} else if ((conversion_blocks[conv_index].width_multiple == 32) && (conversion_blocks[conv_index].height_multiple == 2)) {
 			width_array = w_32_2;
-			height_array = w_32_2;
+			height_array = h_32_2;
 			array_size = size_count_32_2;
 		} else if ((conversion_blocks[conv_index].width_multiple == 2) && (conversion_blocks[conv_index].height_multiple == 2)) {
 			// Non-sse YUV420p conversions
 			width_array = w_32_2;
-			height_array = w_32_2;
+			height_array = h_32_2;
 			array_size = size_count_32_2;
 		} else if ((conversion_blocks[conv_index].width_multiple == 1) && (conversion_blocks[conv_index].height_multiple == 1)) {
 			// All other non-sse conversions
 			width_array = w_16_1;
-			height_array = w_16_1;
+			height_array = h_16_1;
 			array_size = size_count_16_1;
 		}  else {
 			pixfc_log("Unhandled width / height multiple: %u - %u for conversion %-80s\n",
