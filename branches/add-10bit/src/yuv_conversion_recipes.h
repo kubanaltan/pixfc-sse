@@ -208,8 +208,8 @@
 	pack_fn(convert_out, rgb_out_buf);\
 	rgb_out_buf += output_stride;\
 	reconstruct_missing_uv_##instr_set(&unpack_out[7], &unpack_out[10], &unpack_out[8]);\
-	print_xmm16u("Main UVeven33-40", &unpack_out[2]);\
-	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16u("Main UVeven33-40", &unpack_out[8]);\
+	conv_fn_prefix##instr_set(&unpack_out[6], convert_out);\
 	print_xmm16("Main R33-40", &convert_out[0]);\
 	print_xmm16("Main G33-40", &convert_out[1]);\
 	print_xmm16("Main B33-40", &convert_out[2]);\
@@ -223,7 +223,7 @@
 	print_xmm16u("Main NEXT UVodd17-24", &unpack_out[7]);\
 	reconstruct_missing_uv_##instr_set(&unpack_out[10], &unpack_out[1], &unpack_out[11]);\
 	print_xmm16u("Main UVeven41-48", &unpack_out[11]);\
-	conv_fn_prefix##instr_set(&unpack_out[11], &convert_out[3]);\
+	conv_fn_prefix##instr_set(&unpack_out[9], &convert_out[3]);\
 	print_xmm16("Main R41-48", &convert_out[3]);\
 	print_xmm16("Main G41-48", &convert_out[4]);\
 	print_xmm16("Main B41-48", &convert_out[5]);\
