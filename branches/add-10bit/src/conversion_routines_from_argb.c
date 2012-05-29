@@ -414,6 +414,7 @@ DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt709_nonsse, 16, 128, 128, 47, 1
 				*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
 			}\
 		dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
+		pixel = 0;\
 		}\
 	}\
 
