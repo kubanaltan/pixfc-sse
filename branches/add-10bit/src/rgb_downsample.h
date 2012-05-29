@@ -557,14 +557,10 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2(__m128i
  * B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0
  */
 EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(__m128i* in_3_v16i_current_r_g_b_vectors, __m128i* in_3_v16i_previous_r_g_b_vectors, __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
-	CONST_M128I(shuf_previous, 0xFFFFFFFFFFFFFF0ELL, 0xFFFFFFFFFFFFFFFFLL);
-	CONST_M128I(shuf_current, 0xFFFFFF06FFFFFF02LL, 0xFFFFFF0EFFFFFF0ALL);
-	CONST_M128I(shuf_current1, 0xFFFFFF00FFFFFFFFLL, 0xFFFFFF08FFFFFF04LL);
+	CONST_M128I(shuf_current, 0xFF06FFFFFF02FFFFLL, 0xFF0EFFFFFF0AFFFFLL);
 	CONST_M128I(shuf_result, 0xFF04FF04FF00FF00LL, 0xFF0CFF0CFF08FF08LL);
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
-	M128I(scratch3, 0x0LL, 0x0LL);
-
 
 	//
 	// construct a vector of R samples at t = {-1, 1, 3, 5}
@@ -572,16 +568,11 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(_
 	// The result is then averaged with R samples at t = {0, 2, 4, 6}
 	// Since we are doing 422 downsampling, each sample at time t has
 	// a value equal to S-1 / 4 + S0 / 2 + S1 / 4
-	_M(scratch1) = _mm_shuffle_epi8(in_3_v16i_previous_r_g_b_vectors[0], _M(shuf_previous));// PSHUFB	1	0.5
-	// R8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 
 	_M(scratch2) = _mm_shuffle_epi8(in_3_v16i_current_r_g_b_vectors[0], _M(shuf_current));	// PSHUFB	1	0.5
 	// R2 0		0 0		R4 0	0 0		R6 0	0 0		R8 0	0 0
 
-	_M(scratch3) = _mm_shuffle_epi8(_M(scratch2), _M(shuf_current1));						// PSHUFB	1	0.5
-	// 0 0		0 0		R2 0	0 0		R4 0	0 0		R6 0	0 0
-
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));								// POR		1	0.33
+	_M(scratch1) = _mm_alignr_epi8(_M(scratch2), in_3_v16i_previous_r_g_b_vectors[0], 14);	// PALIGNR	1	0.5
 	// R8 0		0 0		R2 0	0 0		R4 0	0 0		R6 0	0 0
 	// (R8 belongs to the previous pixel)
 
@@ -601,16 +592,10 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(_
 
 	//
 	// And repeat for G ...
-	_M(scratch1) = _mm_shuffle_epi8(in_3_v16i_previous_r_g_b_vectors[1],  _M(shuf_previous));// PSHUFB	1	0.5
-	// G8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
-
 	_M(scratch2) = _mm_shuffle_epi8(in_3_v16i_current_r_g_b_vectors[1], _M(shuf_current));	// PSHUFB	1	0.5
 	// G2 0		0 0		G4 0	0 0		G6 0	0 0		G8 0	0 0
 
-	_M(scratch3) = _mm_shuffle_epi8(_M(scratch2), _M(shuf_current1));						// PSHUFB	1	0.5
-	// 0 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
-
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));								// POR		1	0.33
+	_M(scratch1) = _mm_alignr_epi8(_M(scratch2), in_3_v16i_previous_r_g_b_vectors[1], 14);	// PALIGNR	1	0.5
 	// G8 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
 	// (G8 belongs to the previous pixel)
 
@@ -630,16 +615,10 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(_
 
 	//
 	// And repeat for B
-	_M(scratch1) = _mm_shuffle_epi8(in_3_v16i_previous_r_g_b_vectors[2], _M(shuf_previous));// PSHUFB	1	0.5
-	// B8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
-
 	_M(scratch2) = _mm_shuffle_epi8(in_3_v16i_current_r_g_b_vectors[2], _M(shuf_current));	// PSHUFB	1	0.5
 	// B2 0		0 0		B4 0	0 0		B6 0	0 0		B8 0	0 0
 
-	_M(scratch3) = _mm_shuffle_epi8(_M(scratch2), _M(shuf_current1));						// PSHUFB	1	0.5
-	// 0 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
-
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));								// POR		1	0.33
+	_M(scratch1) = _mm_alignr_epi8(_M(scratch2), in_3_v16i_previous_r_g_b_vectors[2], 14);	// PALIGNR	1	0.5
 	// B8 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
 	// (B8 belongs to the previous pixel)
 
