@@ -211,17 +211,17 @@ PixFcPixelFormat	find_matching_pixel_format(char *format_string) {
 uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_t height) {
 	const PixelFormatDescription *desc = &pixfmt_descriptions[fmt];
 
-	// make sure the number of pixels is multiple of 16
-	if ((width * height) % desc->pixel_count_multiple != 0) {
-		pixfc_log("pixel count is not multiple of %u\n", desc->pixel_count_multiple);
-		return -1;
-	}
-
 	// make sure the buffer size has no decimal part IFF the buffer size has no
 	// alignment requirements, ie row_pixel_multiple == 1.
 	if ((desc->row_pixel_multiple == 1) && (((width * height) * desc->bytes_per_pix_num) % desc->bytes_per_pix_denom != 0)) {
 		pixfc_log("buffer size error: (%d * %d) * %d %% %d != 0\n",
 				width, height, desc->bytes_per_pix_num, desc->bytes_per_pix_denom);
+		return -1;
+	}
+
+	// make sure the height is valid
+	if (width % desc->width_multiple != 0) {
+		pixfc_log("width is not multiple of %u\n", desc->width_multiple);
 		return -1;
 	}
 

@@ -127,7 +127,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 			PixFcYUV420P,
-			3, 2, 1, 64, 2, 1,
+			3, 2, 1, 32, 2, 1,
 			{
 				/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 						Decimal values:
@@ -160,7 +160,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		PixFcV210,
-		16, 6, 0, 1, 1, 48,
+		16, 6, 0, 16, 1, 48,
 		{
 			/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 			 Decimal values:

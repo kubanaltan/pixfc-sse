@@ -90,7 +90,7 @@ done:
 	return result;
 }
 
-static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt) {
+static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt) {
 	uint32_t			index = 0;
 	struct PixFcSSE *	pixfc;
 	struct timings		timings;
@@ -102,6 +102,9 @@ static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt) {
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
 		if ((source_fmt != PixFcFormatCount) && (conversion_blocks[index].source_fmt != source_fmt))
+			continue;
+
+		if ((dest_fmt != PixFcFormatCount) && (conversion_blocks[index].dest_fmt != dest_fmt))
 			continue;
 
 		if (create_pixfc_for_conversion_block(index, &pixfc, WIDTH, HEIGHT) != 0) {
@@ -464,12 +467,22 @@ static uint32_t check_v210_conversion_buffer_sizes() {
 			width_array = w_32_2;
 			height_array = h_32_2;
 			array_size = size_count_32_2;
+		} else if ((conversion_blocks[conv_index].width_multiple == 2) && (conversion_blocks[conv_index].height_multiple == 1)) {
+			// Some non-sse conversions
+			width_array = w_32_1;
+			height_array = h_32_1;
+			array_size = size_count_32_1;
+		} else if ((conversion_blocks[conv_index].width_multiple == 1) && (conversion_blocks[conv_index].height_multiple == 2)) {
+			// Some non-sse conversions
+			width_array = w_32_2;
+			height_array = h_32_2;
+			array_size = size_count_32_2;
 		} else if ((conversion_blocks[conv_index].width_multiple == 1) && (conversion_blocks[conv_index].height_multiple == 1)) {
 			// All other non-sse conversions
-			width_array = w_16_1;
-			height_array = h_16_1;
-			array_size = size_count_16_1;
-		}  else {
+			width_array = w_32_1;
+			height_array = h_32_1;
+			array_size = size_count_32_1;
+		} else {
 			pixfc_log("Unhandled width / height multiple: %u - %u for conversion %-80s\n",
 					conversion_blocks[conv_index].width_multiple,
 					conversion_blocks[conv_index].height_multiple,
@@ -495,9 +508,13 @@ static uint32_t check_v210_conversion_buffer_sizes() {
  */
 int 				main(int argc, char **argv) {
 	PixFcPixelFormat	source_fmt = PixFcFormatCount;
+	PixFcPixelFormat	dest_fmt = PixFcFormatCount;
 
-	if (argc == 2)
+	if (argc >= 2)
 		source_fmt = find_matching_pixel_format(argv[1]);
+
+	if (argc == 3)
+		dest_fmt = find_matching_pixel_format(argv[2]);
 
 	pixfc_log("\n");
 	pixfc_log("\t\tU N I T   T E S T I N G\n");
@@ -551,7 +568,7 @@ int 				main(int argc, char **argv) {
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Checking conversion block timing ... \n");
-	if (time_conversion_blocks(source_fmt) != 0) {
+	if (time_conversion_blocks(source_fmt, dest_fmt) != 0) {
 		pixfc_log("FAILED\n");
 		return -1;
 	}

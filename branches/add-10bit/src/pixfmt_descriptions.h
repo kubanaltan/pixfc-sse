@@ -51,12 +51,12 @@ typedef struct {
         // Is this format planar (1) or interleaved (0) ?
         uint8_t					is_planar;
 
-        uint8_t					pixel_count_multiple;
+        uint8_t					width_multiple;
         uint8_t					height_multiple;	// 1 if not applicable
-	
+
 		// Each line must have a multiple of this number of pixels,
 		// or 1 if not applicable. This value is used to calculate
-		// the size in bytes of each line: 
+		// the size in bytes of each line:
 		// (width + (row_pixel_multiple - 1) ) / row_pixel_multiple) * bytes_per_pix_num / bytes_per_pix_den
 		uint8_t					row_pixel_multiple;
 		
