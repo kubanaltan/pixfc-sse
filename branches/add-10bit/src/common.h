@@ -493,7 +493,7 @@
 		if ((width % 24) == 0) {\
 			while(line-- > 0) {\
 				core_first24(__VA_ARGS__);\
-				while(pixel > 24) {\
+				while(pixel >= 24) {\
 					core(__VA_ARGS__);\
 					pixel -= 24;\
 				}\
