@@ -1258,47 +1258,26 @@
  *
  */
 
+#define RGB32_TO_V210_NNB_8PIXELS(convert_out_offset, dbg_prefix, unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+	unpack_fn(rgb_in, unpack_out);\
+	rgb_in += 2;\
+	print_xmm8u(dbg_prefix " R 1-8:", &unpack_out[0]);\
+	print_xmm8u(dbg_prefix " G 1-8:", &unpack_out[1]);\
+	print_xmm8u(dbg_prefix " B 1-8:", &unpack_out[2]);\
+	y_conv_fn(unpack_out, &convert_out[convert_out_offset]);\
+	print_xmm16u(dbg_prefix " Y 1-8", &convert_out[convert_out_offset]);\
+	nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+	print_xmm8u(dbg_prefix " downsampled R 1-8:", &unpack_out[0]);\
+	print_xmm8u(dbg_prefix dbg_prefix " downsampled G 1-8:", &unpack_out[1]);\
+	print_xmm8u(" downsampled B 1-8:", &unpack_out[2]);\
+	uv_conv_fn(unpack_out, &convert_out[convert_out_offset + 1]);\
+	print_xmm16u(dbg_prefix " UV1-4", &convert_out[convert_out_offset + 1]);\
+
 // NNB Core conversion loop, common to RGB32 to V210 NNB conversion
 #define RGB32_TO_V210_NNB_LOOP_CORE(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("Main R 1-8:", &unpack_out[0]);\
-	print_xmm8u("Main G 1-8:", &unpack_out[1]);\
-	print_xmm8u("Main B 1-8:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-	print_xmm8u("Main downsampled R 1-8:", &unpack_out[0]);\
-	print_xmm8u("Main downsampled G 1-8:", &unpack_out[1]);\
-	print_xmm8u("Main downsampled B 1-8:", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("Main UV1-4", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("Main R 9-16:", &unpack_out[0]);\
-	print_xmm8u("Main G 9-16:", &unpack_out[1]);\
-	print_xmm8u("Main B 9-16:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Main Y9-16", &convert_out[2]);\
-	nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-	print_xmm8u("Main downsampled R 9-16:", &unpack_out[0]);\
-	print_xmm8u("Main downsampled G 9-16:", &unpack_out[1]);\
-	print_xmm8u("Main downsampled B 9-16:", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("Main UV5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("Main R 17-24:", &unpack_out[0]);\
-	print_xmm8u("Main G 17-24:", &unpack_out[1]);\
-	print_xmm8u("Main B 17-24:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Main Y17-24", &convert_out[4]);\
-	nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-	print_xmm8u("Main downsampled R 17-24:", &unpack_out[0]);\
-	print_xmm8u("Main downsampled G 17-24:", &unpack_out[1]);\
-	print_xmm8u("Main downsampled B 17-24:", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("Main UV9-12", &convert_out[5]);\
+	RGB32_TO_V210_NNB_8PIXELS(0, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_NNB_8PIXELS(2, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_NNB_8PIXELS(4, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	print_xmm8x("Main v210 1", &yuv_out[0]);\
 	print_xmm8x("Main v210 2", &yuv_out[1]);\
@@ -1308,19 +1287,7 @@
 
 
 #define RGB32_TO_V210_NNB_LOOP_CORE_LEFTOVER8(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("L8 R 1-8:", &unpack_out[0]);\
-	print_xmm8u("L8 G 1-8:", &unpack_out[1]);\
-	print_xmm8u("L8 B 1-8:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("L8 Y1-8", convert_out);\
-	nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-	print_xmm8u("L8 downsampled R 1-8:", &unpack_out[0]);\
-	print_xmm8u("L8 downsampled G 1-8:", &unpack_out[1]);\
-	print_xmm8u("L8 downsampled B 1-8:", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("L8 UV1-4", &convert_out[1]);\
+	RGB32_TO_V210_NNB_8PIXELS(0, "L8", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	convert_out[2] = _mm_setzero_si128();\
 	convert_out[3] = _mm_setzero_si128();\
 	convert_out[4] = _mm_setzero_si128();\
@@ -1333,32 +1300,8 @@
 	yuv_out += 4;\
 
 #define RGB32_TO_V210_NNB_LOOP_CORE_LEFTOVER16(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("L16 R 1-8:", &unpack_out[0]);\
-	print_xmm8u("L16 G 1-8:", &unpack_out[1]);\
-	print_xmm8u("L16 B 1-8:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("L16 Y1-8", convert_out);\
-	nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-	print_xmm8u("L16 downsampled R 1-8:", &unpack_out[0]);\
-	print_xmm8u("L16 downsampled G 1-8:", &unpack_out[1]);\
-	print_xmm8u("L16 downsampled B 1-8:", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("L16 R 9-16:", &unpack_out[0]);\
-	print_xmm8u("L16 G 9-16:", &unpack_out[1]);\
-	print_xmm8u("L16 B 9-16:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("L16 Y9-16", &convert_out[2]);\
-	nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-	print_xmm8u("L16 downsampled R 9-16:", &unpack_out[0]);\
-	print_xmm8u("L16 downsampled G 9-16:", &unpack_out[1]);\
-	print_xmm8u("L16 downsampled B 9-16:", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("L16 UV5-8", &convert_out[3]);\
+	RGB32_TO_V210_NNB_8PIXELS(0, "L16", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_NNB_8PIXELS(2, "L16", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	convert_out[4] = _mm_setzero_si128();\
 	convert_out[5] = _mm_setzero_si128();\
 	pack_fn(convert_out, yuv_out);\
@@ -1388,110 +1331,57 @@
  * AVG Core conversion loop, common to RGB32 to v210 AVG conversion
  *
  */
+#define RGB32_TO_V210_AVG_FIRST_8PIXELS(convert_out_offset, dbg_prefix, unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+	unpack_fn(rgb_in, unpack_out);\
+	rgb_in += 2;\
+	print_xmm8u(dbg_prefix " First R 1-8", &unpack_out[0]);\
+	print_xmm8u(dbg_prefix " First G 1-8", &unpack_out[1]);\
+	print_xmm8u(dbg_prefix " First B 1-8", &unpack_out[2]);\
+	y_conv_fn(unpack_out, &convert_out[convert_out_offset]);\
+	print_xmm16u(dbg_prefix " First Y1-8", &convert_out[convert_out_offset]);\
+	avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+	print_xmm8u(dbg_prefix " First downsampled R 1-8", &unpack_out[0]);\
+	print_xmm8u(dbg_prefix " First downsampled G 1-8", &unpack_out[1]);\
+	print_xmm8u(dbg_prefix " First downsampled B 1-8", &unpack_out[2]);\
+	uv_conv_fn(unpack_out, &convert_out[convert_out_offset + 1]);\
+	print_xmm16u(dbg_prefix " First UV1-4", &convert_out[convert_out_offset + 1]);\
+
+#define RGB32_TO_V210_AVG_8PIXELS(convert_out_offset, dbg_prefix, unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+	unpack_fn(rgb_in, unpack_out);\
+	rgb_in += 2;\
+	print_xmm8u(dbg_prefix " R 1-8", &unpack_out[0]);\
+	print_xmm8u(dbg_prefix " G 1-8", &unpack_out[1]);\
+	print_xmm8u(dbg_prefix " B 1-8", &unpack_out[2]);\
+	y_conv_fn(unpack_out, &convert_out[convert_out_offset]);\
+	print_xmm16u(dbg_prefix " Y1-8", &convert_out[convert_out_offset]);\
+	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+	print_xmm8u(dbg_prefix " downsampled R 1-8", &unpack_out[0]);\
+	print_xmm8u(dbg_prefix " downsampled G 1-8", &unpack_out[1]);\
+	print_xmm8u(dbg_prefix " downsampled B 1-8", &unpack_out[2]);\
+	uv_conv_fn(unpack_out, &convert_out[convert_out_offset + 1]);\
+	print_xmm16u(dbg_prefix " UV1-4", &convert_out[convert_out_offset + 1]);\
+
+
 // First 24 pixel loop core
 #define RGB32_TO_V210_AVG_LOOP_CORE_FIRST24(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 1-8:", &unpack_out[0]);\
-	print_xmm8u("G 1-8:", &unpack_out[1]);\
-	print_xmm8u("B 1-8:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Y1-8", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("UV1-4", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 1-8:", &unpack_out[0]);\
-	print_xmm8u("G 1-8:", &unpack_out[1]);\
-	print_xmm8u("B 1-8:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y1-8", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV1-4", &convert_out[5]);\
+	RGB32_TO_V210_AVG_FIRST_8PIXELS(0, "F24", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_AVG_8PIXELS(2, "F24", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_AVG_8PIXELS(4, "F24", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
 
 
 // First 24 pixel loop core
 #define RGB32_TO_V210_AVG_LOOP_CORE(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 9-16", &unpack_out[0]);\
-	print_xmm8u("G 9-16", &unpack_out[1]);\
-	print_xmm8u("B 9-16", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Y1-8", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[0]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[1]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("UV 5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 17-24:", &unpack_out[0]);\
-	print_xmm8u("G 17-24:", &unpack_out[1]);\
-	print_xmm8u("B 17-24:", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y17-24", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-	print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-	print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV9-12", &convert_out[5]);\
+	RGB32_TO_V210_AVG_8PIXELS(0, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_AVG_8PIXELS(2, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_AVG_8PIXELS(4, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
 
 // Leftover 8 pixel loop core
 #define RGB32_TO_V210_AVG_LOOP_CORE_LEFTOVER8(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
+	RGB32_TO_V210_AVG_8PIXELS(0, "L8", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	convert_out[2] = _mm_setzero_si128();\
 	convert_out[3] = _mm_setzero_si128();\
 	convert_out[4] = _mm_setzero_si128();\
@@ -1501,91 +1391,23 @@
 
 // First leftover 16 pixel loop core
 #define RGB32_TO_V210_AVG_LOOP_CORE_FIRST_LEFTOVER16(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 9-16", &unpack_out[0]);\
-	print_xmm8u("G 9-16", &unpack_out[1]);\
-	print_xmm8u("B 9-16", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[0]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[1]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("UV 5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 17-24", &unpack_out[0]);\
-	print_xmm8u("G 17-24", &unpack_out[1]);\
-	print_xmm8u("B 17-24", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y1-8", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-	print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-	print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV9-12", &convert_out[5]);\
+	RGB32_TO_V210_AVG_FIRST_8PIXELS(0, "FL16", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_AVG_8PIXELS(2, "FL16", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	convert_out[4] = _mm_setzero_si128();\
+	convert_out[5] = _mm_setzero_si128();\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
 
+
 // Last leftover 16 pixel loop core
 #define RGB32_TO_V210_AVG_LOOP_CORE_LEFTOVER16(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 9-16", &unpack_out[0]);\
-	print_xmm8u("G 9-16", &unpack_out[1]);\
-	print_xmm8u("B 9-16", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[0]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[1]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("UV 5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 2;\
-	print_xmm8u("R 17-24", &unpack_out[0]);\
-	print_xmm8u("G 17-24", &unpack_out[1]);\
-	print_xmm8u("B 17-24", &unpack_out[2]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y1-8", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-	print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-	print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV9-12", &convert_out[5]);\
+	RGB32_TO_V210_AVG_8PIXELS(0, "L16", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	RGB32_TO_V210_AVG_8PIXELS(2, "L16", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	convert_out[4] = _mm_setzero_si128();\
+	convert_out[5] = _mm_setzero_si128();\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
+
 
 // Average v210 conversion
 #define AVG_DOWNSAMPLE_RGB32_TO_V210_RECIPE(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
@@ -1609,110 +1431,47 @@
  *  NNB Core RGB24 to v210 conversion loop
  *
  */
+// Used by both RGB24 NNB and AVG conversion loop cores
+#define RGB24_TO_V210_UNPACK_16PIXELS(dbg_prefix, unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
+	unpack_fn(rgb_in, unpack_out);\
+	rgb_in += 3;\
+	print_xmm8u(dbg_prefix " R 1-8", &unpack_out[0]);\
+	print_xmm8u(dbg_prefix " G 1-8", &unpack_out[1]);\
+	print_xmm8u(dbg_prefix " B 1-8", &unpack_out[2]);\
+	print_xmm8u(dbg_prefix " R 9-16", &unpack_out[3]);\
+	print_xmm8u(dbg_prefix " G 9-16", &unpack_out[4]);\
+	print_xmm8u(dbg_prefix " B 9-16", &unpack_out[5]);\
+
+#define RGB24_TO_V210_NNB_CONVERT_8PIXELS(unpack_out_offset, convert_out_offset, dbg_prefix, unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
+	y_conv_fn(&unpack_out[unpack_out_offset], &convert_out[convert_out_offset]);\
+	print_xmm16u(dbg_prefix " Y1-8", &convert_out[convert_out_offset]);\
+	nnb_422_downsample_r_g_b_vectors_##instr_set(&unpack_out[unpack_out_offset], &unpack_out[unpack_out_offset]);\
+	print_xmm8u(dbg_prefix " downsampled R 1-8", &unpack_out[unpack_out_offset]);\
+	print_xmm8u(dbg_prefix " downsampled G 1-8", &unpack_out[unpack_out_offset + 1]);\
+	print_xmm8u(dbg_prefix " downsampled B 1-8", &unpack_out[unpack_out_offset + 2]);\
+	uv_conv_fn(&unpack_out[unpack_out_offset], &convert_out[convert_out_offset + 1]);\
+	print_xmm16u(dbg_prefix " UV1-4", &convert_out[convert_out_offset + 1]);\
+
 // 48 pixel loop core
 #define RGB24_TO_V210_NNB_LOOP_CORE(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-		unpack_fn(rgb_in, unpack_out);\
-		rgb_in += 3;\
-		print_xmm8u("R 1-8", &unpack_out[0]);\
-		print_xmm8u("G 1-8", &unpack_out[1]);\
-		print_xmm8u("B 1-8", &unpack_out[2]);\
-		print_xmm8u("R 9-16", &unpack_out[3]);\
-		print_xmm8u("G 9-16", &unpack_out[4]);\
-		print_xmm8u("B 9-16", &unpack_out[5]);\
-		y_conv_fn(unpack_out, convert_out);\
-		print_xmm16u("Y1-8", convert_out);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-		print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-		print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-		uv_conv_fn(unpack_out, &convert_out[1]);\
-		print_xmm16u("UV1-4", &convert_out[1]);\
-		y_conv_fn(&unpack_out[3], &convert_out[2]);\
-		print_xmm16u("Y9-16", &convert_out[2]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(&unpack_out[3], &unpack_out[3]);\
-		print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-		print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-		print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-		uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-		print_xmm16u("UV5-8", &convert_out[3]);\
-		unpack_fn(rgb_in, unpack_out);\
-		rgb_in += 3;\
-		print_xmm8u("R 17-24", &unpack_out[0]);\
-		print_xmm8u("G 17-24", &unpack_out[1]);\
-		print_xmm8u("B 17-24", &unpack_out[2]);\
-		print_xmm8u("R 25-32", &unpack_out[3]);\
-		print_xmm8u("G 25-32", &unpack_out[4]);\
-		print_xmm8u("B 25-32", &unpack_out[5]);\
-		y_conv_fn(unpack_out, &convert_out[4]);\
-		print_xmm16u("Y17-24", &convert_out[4]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-		print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-		print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-		uv_conv_fn(unpack_out, &convert_out[5]);\
-		print_xmm16u("UV9-12", &convert_out[5]);\
+		RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(0, 0, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(3, 2, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(0, 4, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 		pack_fn(convert_out, yuv_out);\
 		yuv_out += 4;\
-		y_conv_fn(&unpack_out[3], &convert_out[0]);\
-		print_xmm16u("Y25-32", &convert_out[0]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(&unpack_out[3], &unpack_out[3]);\
-		print_xmm8u("downsampled R 25-32", &unpack_out[3]);\
-		print_xmm8u("downsampled G 25-32", &unpack_out[4]);\
-		print_xmm8u("downsampled B 25-32", &unpack_out[5]);\
-		uv_conv_fn(&unpack_out[3], &convert_out[1]);\
-		print_xmm16u("UV13-16", &convert_out[1]);\
-		unpack_fn(rgb_in, unpack_out);\
-		rgb_in += 3;\
-		print_xmm8u("R 33-40", &unpack_out[0]);\
-		print_xmm8u("G 33-40", &unpack_out[1]);\
-		print_xmm8u("B 33-40", &unpack_out[2]);\
-		print_xmm8u("R 41-48", &unpack_out[3]);\
-		print_xmm8u("G 41-48", &unpack_out[4]);\
-		print_xmm8u("B 41-48", &unpack_out[5]);\
-		y_conv_fn(unpack_out, &convert_out[2]);\
-		print_xmm16u("Y33-40", &convert_out[2]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		print_xmm8u("downsampled R 33-40", &unpack_out[0]);\
-		print_xmm8u("downsampled G 33-40", &unpack_out[1]);\
-		print_xmm8u("downsampled B 33-40", &unpack_out[2]);\
-		uv_conv_fn(unpack_out, &convert_out[3]);\
-		print_xmm16u("UV17-20", &convert_out[3]);\
-		y_conv_fn(&unpack_out[3], &convert_out[4]);\
-		print_xmm16u("Y41-48", &convert_out[4]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(&unpack_out[3], &unpack_out[3]);\
-		print_xmm8u("downsampled R 41-48", &unpack_out[3]);\
-		print_xmm8u("downsampled G 41-48", &unpack_out[4]);\
-		print_xmm8u("downsampled B 41-48", &unpack_out[5]);\
-		uv_conv_fn(&unpack_out[3], &convert_out[5]);\
-		print_xmm16u("UV21-24", &convert_out[5]);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(3, 0, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(0, 2, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(3, 4, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 		pack_fn(convert_out, yuv_out);\
 		yuv_out += 4;\
 
 #define RGB24_TO_V210_NNB_LOOP_CORE_LEFTOVER16(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-		unpack_fn(rgb_in, unpack_out);\
-		rgb_in += 3;\
-		print_xmm8u("R 1-8", &unpack_out[0]);\
-		print_xmm8u("G 1-8", &unpack_out[1]);\
-		print_xmm8u("B 1-8", &unpack_out[2]);\
-		print_xmm8u("R 9-16", &unpack_out[3]);\
-		print_xmm8u("G 9-16", &unpack_out[4]);\
-		print_xmm8u("B 9-16", &unpack_out[5]);\
-		y_conv_fn(unpack_out, convert_out);\
-		print_xmm16u("Y1-8", convert_out);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-		print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-		print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-		uv_conv_fn(unpack_out, &convert_out[1]);\
-		print_xmm16u("UV1-4", &convert_out[1]);\
-		y_conv_fn(&unpack_out[3], &convert_out[2]);\
-		print_xmm16u("Y9-16", &convert_out[2]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(&unpack_out[3], &unpack_out[3]);\
-		print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-		print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-		print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-		uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-		print_xmm16u("UV5-8", &convert_out[3]);\
+		RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(0, 0, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(3, 2, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 		convert_out[4] = _mm_setzero_si128();\
 		convert_out[5] = _mm_setzero_si128();\
 		pack_fn(convert_out, yuv_out);\
@@ -1725,56 +1484,14 @@
 		yuv_out += 4;\
 
 #define RGB24_TO_V210_NNB_LOOP_CORE_LEFTOVER32(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-		unpack_fn(rgb_in, unpack_out);\
-		rgb_in += 3;\
-		print_xmm8u("R 1-8", &unpack_out[0]);\
-		print_xmm8u("G 1-8", &unpack_out[1]);\
-		print_xmm8u("B 1-8", &unpack_out[2]);\
-		print_xmm8u("R 9-16", &unpack_out[3]);\
-		print_xmm8u("G 9-16", &unpack_out[4]);\
-		print_xmm8u("B 9-16", &unpack_out[5]);\
-		y_conv_fn(unpack_out, convert_out);\
-		print_xmm16u("Y1-8", convert_out);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-		print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-		print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-		uv_conv_fn(unpack_out, &convert_out[1]);\
-		print_xmm16u("UV1-4", &convert_out[1]);\
-		y_conv_fn(&unpack_out[3], &convert_out[2]);\
-		print_xmm16u("Y9-16", &convert_out[2]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(&unpack_out[3], &unpack_out[3]);\
-		print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-		print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-		print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-		uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-		print_xmm16u("UV5-8", &convert_out[3]);\
-		unpack_fn(rgb_in, unpack_out);\
-		rgb_in += 3;\
-		print_xmm8u("R 17-24", &unpack_out[0]);\
-		print_xmm8u("G 17-24", &unpack_out[1]);\
-		print_xmm8u("B 17-24", &unpack_out[2]);\
-		print_xmm8u("R 25-32", &unpack_out[3]);\
-		print_xmm8u("G 25-32", &unpack_out[4]);\
-		print_xmm8u("B 25-32", &unpack_out[5]);\
-		y_conv_fn(unpack_out, &convert_out[4]);\
-		print_xmm16u("Y17-24", &convert_out[4]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-		print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-		print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-		uv_conv_fn(unpack_out, &convert_out[5]);\
-		print_xmm16u("UV9-12", &convert_out[5]);\
+		RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(0, 0, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(3, 2, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(0, 4, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 		pack_fn(convert_out, yuv_out);\
 		yuv_out += 4;\
-		y_conv_fn(&unpack_out[3], &convert_out[0]);\
-		print_xmm16u("Y25-32", &convert_out[0]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(&unpack_out[3], &unpack_out[3]);\
-		print_xmm8u("downsampled R 25-32", &unpack_out[3]);\
-		print_xmm8u("downsampled G 25-32", &unpack_out[4]);\
-		print_xmm8u("downsampled B 25-32", &unpack_out[5]);\
-		uv_conv_fn(&unpack_out[3], &convert_out[1]);\
-		print_xmm16u("UV13-16", &convert_out[1]);\
+		RGB24_TO_V210_NNB_CONVERT_8PIXELS(3, 0, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 		convert_out[2] = _mm_setzero_si128();\
 		convert_out[3] = _mm_setzero_si128();\
 		convert_out[4] = _mm_setzero_si128();\
@@ -1801,188 +1518,63 @@
 /*
  *  AVG Core RGB24 to v210 conversion loop
  */
+#define RGB24_TO_V210_AVG_CONVERT_FIRST_8PIXELS(unpack_out_offset, convert_out_offset, dbg_prefix, unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
+	y_conv_fn(&unpack_out[unpack_out_offset], &convert_out[convert_out_offset]);\
+	print_xmm16u(dbg_prefix " First Y1-8", &convert_out[convert_out_offset]);\
+	avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+	print_xmm8u(dbg_prefix " First downsampled R 1-8", &unpack_out[unpack_out_offset]);\
+	print_xmm8u(dbg_prefix " First downsampled G 1-8", &unpack_out[unpack_out_offset + 1]);\
+	print_xmm8u(dbg_prefix " First downsampled B 1-8", &unpack_out[unpack_out_offset + 2]);\
+	uv_conv_fn(unpack_out, &convert_out[convert_out_offset + 1]);\
+	print_xmm16u(dbg_prefix " First UV1-4", &convert_out[convert_out_offset + 1]);\
+
+#define RGB24_TO_V210_AVG_CONVERT_8PIXELS(unpack_out_offset, convert_out_offset, dbg_prefix, unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
+	y_conv_fn(&unpack_out[unpack_out_offset], &convert_out[convert_out_offset]);\
+	print_xmm16u(dbg_prefix " Y1-8", &convert_out[convert_out_offset]);\
+	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[unpack_out_offset], previous, &unpack_out[unpack_out_offset]);\
+	print_xmm8u(dbg_prefix " downsampled R 1-8", &unpack_out[unpack_out_offset]);\
+	print_xmm8u(dbg_prefix " downsampled G 1-8", &unpack_out[unpack_out_offset + 1]);\
+	print_xmm8u(dbg_prefix " downsampled B 1-8", &unpack_out[unpack_out_offset + 2]);\
+	uv_conv_fn(&unpack_out[unpack_out_offset], &convert_out[convert_out_offset + 1]);\
+	print_xmm16u(dbg_prefix "UV1-4", &convert_out[convert_out_offset +1]);\
+
+
 // First 48 pixel loop core
 #define RGB24_TO_V210_AVG_LOOP_CORE_FIRST48(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	print_xmm8u("R 9-16", &unpack_out[3]);\
-	print_xmm8u("G 9-16", &unpack_out[4]);\
-	print_xmm8u("B 9-16", &unpack_out[5]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	y_conv_fn(&unpack_out[3], &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-	print_xmm16u("UV5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 17-24", &unpack_out[0]);\
-	print_xmm8u("G 17-24", &unpack_out[1]);\
-	print_xmm8u("B 17-24", &unpack_out[2]);\
-	print_xmm8u("R 25-32", &unpack_out[3]);\
-	print_xmm8u("G 25-32", &unpack_out[4]);\
-	print_xmm8u("B 25-32", &unpack_out[5]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y17-24", &convert_out[4]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-	print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-	print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV9-12", &convert_out[5]);\
+	RGB24_TO_V210_UNPACK_16PIXELS("F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_FIRST_8PIXELS(0, 0, "F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 2, "F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_UNPACK_16PIXELS("F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 4, "F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
-	y_conv_fn(&unpack_out[3], &convert_out[0]);\
-	print_xmm16u("Y25-32", &convert_out[0]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 25-32", &unpack_out[3]);\
-	print_xmm8u("downsampled G 25-32", &unpack_out[4]);\
-	print_xmm8u("downsampled B 25-32", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[1]);\
-	print_xmm16u("UV13-16", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 33-40", &unpack_out[0]);\
-	print_xmm8u("G 33-40", &unpack_out[1]);\
-	print_xmm8u("B 33-40", &unpack_out[2]);\
-	print_xmm8u("R 41-48", &unpack_out[3]);\
-	print_xmm8u("G 41-48", &unpack_out[4]);\
-	print_xmm8u("B 41-48", &unpack_out[5]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Y33-40", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 33-40", &unpack_out[0]);\
-	print_xmm8u("downsampled G 33-40", &unpack_out[1]);\
-	print_xmm8u("downsampled B 33-40", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("UV17-20", &convert_out[3]);\
-	y_conv_fn(&unpack_out[3], &convert_out[4]);\
-	print_xmm16u("Y41-48", &convert_out[4]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 41-48", &unpack_out[3]);\
-	print_xmm8u("downsampled G 41-48", &unpack_out[4]);\
-	print_xmm8u("downsampled B 41-48", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[5]);\
-	print_xmm16u("UV21-24", &convert_out[5]);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 0, "F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_UNPACK_16PIXELS("F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 2, "F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 4, "F48", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
 
 #define RGB24_TO_V210_AVG_LOOP_CORE(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	print_xmm8u("R 9-16", &unpack_out[3]);\
-	print_xmm8u("G 9-16", &unpack_out[4]);\
-	print_xmm8u("B 9-16", &unpack_out[5]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	y_conv_fn(&unpack_out[3], &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-	print_xmm16u("UV5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 17-24", &unpack_out[0]);\
-	print_xmm8u("G 17-24", &unpack_out[1]);\
-	print_xmm8u("B 17-24", &unpack_out[2]);\
-	print_xmm8u("R 25-32", &unpack_out[3]);\
-	print_xmm8u("G 25-32", &unpack_out[4]);\
-	print_xmm8u("B 25-32", &unpack_out[5]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y17-24", &convert_out[4]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-	print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-	print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV9-12", &convert_out[5]);\
+	RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 0, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 2, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 4, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
-	y_conv_fn(&unpack_out[3], &convert_out[0]);\
-	print_xmm16u("Y25-32", &convert_out[0]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 25-32", &unpack_out[3]);\
-	print_xmm8u("downsampled G 25-32", &unpack_out[4]);\
-	print_xmm8u("downsampled B 25-32", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[1]);\
-	print_xmm16u("UV13-16", &convert_out[1]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 33-40", &unpack_out[0]);\
-	print_xmm8u("G 33-40", &unpack_out[1]);\
-	print_xmm8u("B 33-40", &unpack_out[2]);\
-	print_xmm8u("R 41-48", &unpack_out[3]);\
-	print_xmm8u("G 41-48", &unpack_out[4]);\
-	print_xmm8u("B 41-48", &unpack_out[5]);\
-	y_conv_fn(unpack_out, &convert_out[2]);\
-	print_xmm16u("Y33-40", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 33-40", &unpack_out[0]);\
-	print_xmm8u("downsampled G 33-40", &unpack_out[1]);\
-	print_xmm8u("downsampled B 33-40", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
-	print_xmm16u("UV17-20", &convert_out[3]);\
-	y_conv_fn(&unpack_out[3], &convert_out[4]);\
-	print_xmm16u("Y41-48", &convert_out[4]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 41-48", &unpack_out[3]);\
-	print_xmm8u("downsampled G 41-48", &unpack_out[4]);\
-	print_xmm8u("downsampled B 41-48", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[5]);\
-	print_xmm16u("UV21-24", &convert_out[5]);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 0, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_UNPACK_16PIXELS("Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 2, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 4, "Main", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
 
+
 #define RGB24_TO_V210_AVG_LOOP_CORE_FIRST_LEFTOVER16(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	print_xmm8u("R 9-16", &unpack_out[3]);\
-	print_xmm8u("G 9-16", &unpack_out[4]);\
-	print_xmm8u("B 9-16", &unpack_out[5]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	y_conv_fn(&unpack_out[3], &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-	print_xmm16u("UV5-8", &convert_out[3]);\
+	RGB24_TO_V210_UNPACK_16PIXELS("FL16", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_FIRST_8PIXELS(0, 0, "FL16", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 2, "FL16", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	convert_out[4] = _mm_setzero_si128();\
 	convert_out[5] = _mm_setzero_si128();\
 	pack_fn(convert_out, yuv_out);\
@@ -1995,30 +1587,9 @@
 	yuv_out += 4;\
 
 #define RGB24_TO_V210_AVG_LOOP_CORE_LEFTOVER16(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	print_xmm8u("R 9-16", &unpack_out[3]);\
-	print_xmm8u("G 9-16", &unpack_out[4]);\
-	print_xmm8u("B 9-16", &unpack_out[5]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	y_conv_fn(&unpack_out[3], &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-	print_xmm16u("UV5-8", &convert_out[3]);\
+	RGB24_TO_V210_UNPACK_16PIXELS("L16", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 0, "L16", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 2, "L16", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	convert_out[4] = _mm_setzero_si128();\
 	convert_out[5] = _mm_setzero_si128();\
 	pack_fn(convert_out, yuv_out);\
@@ -2030,57 +1601,16 @@
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
 
+
 #define RGB24_TO_V210_AVG_LOOP_CORE_FIRST_LEFTOVER32(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	print_xmm8u("R 9-16", &unpack_out[3]);\
-	print_xmm8u("G 9-16", &unpack_out[4]);\
-	print_xmm8u("B 9-16", &unpack_out[5]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	y_conv_fn(&unpack_out[3], &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-	print_xmm16u("UV5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 17-24", &unpack_out[0]);\
-	print_xmm8u("G 17-24", &unpack_out[1]);\
-	print_xmm8u("B 17-24", &unpack_out[2]);\
-	print_xmm8u("R 25-32", &unpack_out[3]);\
-	print_xmm8u("G 25-32", &unpack_out[4]);\
-	print_xmm8u("B 25-32", &unpack_out[5]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y17-24", &convert_out[4]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-	print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-	print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV9-12", &convert_out[5]);\
+	RGB24_TO_V210_UNPACK_16PIXELS("FL32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_FIRST_8PIXELS(0, 0, "FL32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 2, "FL32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_UNPACK_16PIXELS("FL32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 4, "FL32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
-	y_conv_fn(&unpack_out[3], &convert_out[0]);\
-	print_xmm16u("Y25-32", &convert_out[0]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 25-32", &unpack_out[3]);\
-	print_xmm8u("downsampled G 25-32", &unpack_out[4]);\
-	print_xmm8u("downsampled B 25-32", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[1]);\
-	print_xmm16u("UV13-16", &convert_out[1]);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 0, "FL32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	convert_out[2] = _mm_setzero_si128();\
 	convert_out[3] = _mm_setzero_si128();\
 	convert_out[4] = _mm_setzero_si128();\
@@ -2089,56 +1619,14 @@
 	yuv_out += 4;\
 
 #define RGB24_TO_V210_AVG_LOOP_CORE_LEFTOVER32(unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 1-8", &unpack_out[0]);\
-	print_xmm8u("G 1-8", &unpack_out[1]);\
-	print_xmm8u("B 1-8", &unpack_out[2]);\
-	print_xmm8u("R 9-16", &unpack_out[3]);\
-	print_xmm8u("G 9-16", &unpack_out[4]);\
-	print_xmm8u("B 9-16", &unpack_out[5]);\
-	y_conv_fn(unpack_out, convert_out);\
-	print_xmm16u("Y1-8", convert_out);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 1-8", &unpack_out[0]);\
-	print_xmm8u("downsampled G 1-8", &unpack_out[1]);\
-	print_xmm8u("downsampled B 1-8", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[1]);\
-	print_xmm16u("UV1-4", &convert_out[1]);\
-	y_conv_fn(&unpack_out[3], &convert_out[2]);\
-	print_xmm16u("Y9-16", &convert_out[2]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 9-16", &unpack_out[3]);\
-	print_xmm8u("downsampled G 9-16", &unpack_out[4]);\
-	print_xmm8u("downsampled B 9-16", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[3]);\
-	print_xmm16u("UV5-8", &convert_out[3]);\
-	unpack_fn(rgb_in, unpack_out);\
-	rgb_in += 3;\
-	print_xmm8u("R 17-24", &unpack_out[0]);\
-	print_xmm8u("G 17-24", &unpack_out[1]);\
-	print_xmm8u("B 17-24", &unpack_out[2]);\
-	print_xmm8u("R 25-32", &unpack_out[3]);\
-	print_xmm8u("G 25-32", &unpack_out[4]);\
-	print_xmm8u("B 25-32", &unpack_out[5]);\
-	y_conv_fn(unpack_out, &convert_out[4]);\
-	print_xmm16u("Y17-24", &convert_out[4]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
-	print_xmm8u("downsampled R 17-24", &unpack_out[0]);\
-	print_xmm8u("downsampled G 17-24", &unpack_out[1]);\
-	print_xmm8u("downsampled B 17-24", &unpack_out[2]);\
-	uv_conv_fn(unpack_out, &convert_out[5]);\
-	print_xmm16u("UV9-12", &convert_out[5]);\
+	RGB24_TO_V210_UNPACK_16PIXELS("L32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 0, "L32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 2, "L32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_UNPACK_16PIXELS("L32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(0, 4, "L32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
-	y_conv_fn(&unpack_out[3], &convert_out[0]);\
-	print_xmm16u("Y25-32", &convert_out[0]);\
-	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(&unpack_out[3], previous, &unpack_out[3]);\
-	print_xmm8u("downsampled R 25-32", &unpack_out[3]);\
-	print_xmm8u("downsampled G 25-32", &unpack_out[4]);\
-	print_xmm8u("downsampled B 25-32", &unpack_out[5]);\
-	uv_conv_fn(&unpack_out[3], &convert_out[1]);\
-	print_xmm16u("UV13-16", &convert_out[1]);\
+	RGB24_TO_V210_AVG_CONVERT_8PIXELS(3, 0, "L32", unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set);\
 	convert_out[2] = _mm_setzero_si128();\
 	convert_out[3] = _mm_setzero_si128();\
 	convert_out[4] = _mm_setzero_si128();\
