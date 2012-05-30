@@ -160,7 +160,7 @@
 		if ((width % 24) == 0) {\
 			while(line-- > 0) {\
 				core_first24 LeftParenthesis __VA_ARGS__ RightParenthesis;\
-				while(pixel > 24) {\
+				while(pixel >= 24) {\
 					core LeftParenthesis __VA_ARGS__ RightParenthesis;\
 					pixel -= 24;\
 				}\
