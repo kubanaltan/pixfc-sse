@@ -30,7 +30,7 @@
 static void nnb_422_downsample_ag_rb_vectors_scalar(__m128i *input, __m128i* output) {
 	uint16_t*	in = (uint16_t*) input;
 	uint16_t*	out = (uint16_t*) output;
-	uint32_t		index = 0;
+	uint32_t	index = 0;
 
 	for(index = 0; index < 16; index += 2) {
 		*out++ = *in;
@@ -38,6 +38,14 @@ static void nnb_422_downsample_ag_rb_vectors_scalar(__m128i *input, __m128i* out
 	}
 }
 
-static uint32_t	check_nnb_422_downsample_ag_rb_vectors() {
-	nnb_422_downsample_ag_rb_vectors_sse2()
+uint32_t	check_nnb_422_downsample_ag_rb_vectors() {
+    DECLARE_4_8BIT_VECT(input);
+    __m128i sse_output[2];
+    __m128i scalar_output[2];
+
+    nnb_422_downsample_ag_rg_vectors_scalar(input, scalar_output);
+	nnb_422_downsample_ag_rb_vectors_sse2(input, sse_output);
+
+    compare_8bit_output(scalar_output, sse_output, MAX_DIFF_8BIT, "nnb_422_downsample_ag_rb");
+
 }
