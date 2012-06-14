@@ -63,7 +63,7 @@ list(APPEND INLINE_FILENAME
 
 # List of source files
 list(APPEND SOURCE_LIST
-	inline-unit-testing.c
+	inline-unit-test.c
 )
 # add inline source file to source file list
 foreach(CUR_FILE ${INLINE_FILENAME})
@@ -80,6 +80,5 @@ endforeach(CUR_FILE)
 source_group("source files" FILES ${SOURCE_LIST})
 source_group("header files" FILES ${HEADER_LIST})
 # Create unit testing app
-add_executable(${SOURCE_LIST} ${HEADER_LIST}
-)
+add_executable(inline-unit-test ${SOURCE_LIST} ${HEADER_LIST})
 
