@@ -64,6 +64,8 @@ list(APPEND INLINE_FILENAME
 # List of source files
 list(APPEND SOURCE_LIST
 	inline-unit-test.c
+	inline-testing-common.c
+	../common.c
 )
 # add inline source file to source file list
 foreach(CUR_FILE ${INLINE_FILENAME})

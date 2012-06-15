@@ -1,9 +1,9 @@
-#include "platform_util.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "platform_util.h"
+#include "common.h"
 
 #define MAX_DIFF_8BIT      2
 
@@ -62,71 +62,35 @@
                                 strrchr(__FILE__, '/')+1,\
                                 __LINE__, ## __VA_ARGS__);\
                                 fflush(stderr); } while(0)
+#ifdef DEBUG
+	void	print_xmm8u_array(uint32_t count, char *prefix, void *array);
+	void	print_xmm16u_array(uint32_t count, char *prefix, void *array);
+#else
+	#define print_xmm8u_array(...)
+	#define print_xmm16u_array(...)
+#endif
 
-#define print_xmm8u(prefix, vec) dprintf(prefix "\t % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu % 3hhu\n",\
-                        vec[0], vec[1], vec[2], vec[3], vec[4], vec[5], vec[6], vec[7], vec[8], vec[9], vec[10], vec[11], vec[12], vec[13], vec[14], vec[15])
+void	compare_8bit_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
+void	compare_16bit_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
 
-#define print_xmm16u(prefix, vec) dprintf(prefix "\t%5hu\t%5hu\t%5hu\t%5hu\t%5hu\t%5hu\t%5hu\t%5hu\n",\
-						vec[0], vec[1], vec[2], vec[3], vec[4], vec[5], vec[6], vec[7]);\
-
-#define   compare_8bit_output(check_last, scalar_out, sse_out, sse_out_count, max_diff, prefix) do {\
-        uint8_t* scalar = (uint8_t*) scalar_out;\
-        uint8_t* sse = (uint8_t*) sse_out;\
-        uint8_t  index;\
-        for(index = 0; index < 16 * sse_out_count; index++) {\
-			if ((check_last != 0) && (16 - (index % 16) > check_last))\
-				continue;\
-            if (abs(scalar[index] - sse[index]) > max_diff) {\
-				uint8_t* vec = &sse[(index / 16) * 16];\
-                dprintf("== %s\n", prefix);\
-				dprintf("Value @ %hhu in '%s' vector %u differs by %u: sse: %hhu - scalar: %hhu\n", (index % 16), check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 16), abs(sse[index]-scalar[index]), sse[index], scalar[index]);\
-				dprintf("#     \t  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15\n");\
-				print_xmm8u("SSE   ", vec);\
-				vec = &scalar[(index / 16) * 16];\
-				print_xmm8u("Scalar", vec);\
-                break;\
-            }\
-        }\
-    } while(0)
-
-#define   compare_16bit_output(check_last, scalar_out, sse_out, sse_out_count, max_diff, prefix) do {\
-        uint16_t* scalar = (uint16_t*) scalar_out;\
-        uint16_t* sse = (uint16_t*) sse_out;\
-        uint8_t  index;\
-        for(index = 0; index < 8 * sse_out_count; index++) {\
-			if ((check_last != 0) && (8 - (index % 8) > check_last))\
-				continue;\
-            if (abs(scalar[index] - sse[index]) > max_diff) {\
-				uint16_t* vec = &sse[(index / 8) * 8];\
-                dprintf("== %s\n", prefix);\
-				dprintf("Value @ %hhu in '%s' vector %u differs by %u: sse: %hu - scalar: %hu\n", (index % 8), check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 8), abs(sse[index]-scalar[index]), sse[index], scalar[index]);\
-				dprintf("#     \t    0\t    1\t    2\t    3\t    4\t    5\t    6\t    7\n");\
-				print_xmm16u("SSE   ", vec);\
-				vec = &scalar[(index / 8) * 8];\
-				print_xmm16u("Scalar", vec);\
-				break;\
-            }\
-        }\
-    } while(0)
-
-#define DO_CHECK_INLINE_1IN(inline_scalar, inline1_sse, inline2_sse, input, scalar_out, sse_out, sse_out_count, max_diff, compare_fn)\
+#define DO_CHECK_INLINE_1IN(inline_scalar, inline1_sse, inline2_sse, input, scalar_out, sse_out, output_count, max_diff, compare_fn)\
 	do {\
 		int i = 0;\
 		dprintf("Checking " #inline1_sse "\n");\
 		inline_scalar(input, scalar_out);\
 		inline1_sse(input, sse_out);\
-		compare_fn(0, scalar_out, sse_out, sse_out_count, max_diff, #inline1_sse);\
-		for(i = 0; i < sse_out_count; i++)\
+		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline1_sse);\
+		for(i = 0; i < output_count; i++)\
 			sse_out[i] = _mm_setzero_si128();\
 		dprintf("Checking " #inline2_sse "\n");\
 		inline2_sse(input, sse_out);\
-		compare_fn(0, scalar_out, sse_out, sse_out_count, max_diff, #inline2_sse);\
+		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline2_sse);\
 	} while (0)
 
 #define	 CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(inline_prefix, input, scalar_output, sse_output, sse_output_count, max_diff)	\
 	DO_CHECK_INLINE_1IN(inline_prefix ## scalar, inline_prefix ## sse2, inline_prefix ##sse2_ssse3, input, scalar_output, sse_output, sse_output_count, max_diff, compare_16bit_output)
 
-#define DO_CHECK_INLINE_2IN(inline_scalar, inline1_sse, inline2_sse, input, scalar_prev_input, sse_prev_input, prev_input_count, check_last, scalar_out, sse_out, sse_out_count, max_diff, compare_fn)\
+#define DO_CHECK_INLINE_2IN(inline_scalar, inline1_sse, inline2_sse, input, input_count, scalar_prev_input, sse_prev_input, prev_input_count, check_last, scalar_out, sse_out, output_count, max_diff, compare_fn)\
 	do {\
 		int i = 0;\
 		__m128i sse_prev_input_copy[prev_input_count];\
@@ -136,21 +100,37 @@
 			scalar_prev_input_copy[i] = scalar_prev_input[i];\
 		}\
 		dprintf("Checking " #inline1_sse "\n");\
+		print_xmm16u_array(input_count, "INPUT SCALAR ", input);\
+		print_xmm16u_array(prev_input_count, "SCALAR_PREV_INPUT", scalar_prev_input);\
 		inline_scalar(input, scalar_prev_input, scalar_out);\
+		print_xmm16u_array(prev_input_count, "SCALAR_PREV_INPUT", scalar_prev_input);\
+		print_xmm16u_array(output_count, "SCALAR_OUTPUT", scalar_out);\
+		print_xmm16u_array(input_count, "INPUT SSE ", input);\
+		print_xmm16u_array(prev_input_count, "SSE_PREV_INPUT", sse_prev_input);\
 		inline1_sse(input, sse_prev_input, sse_out);\
-		compare_fn(0, scalar_out, sse_out, sse_out_count, max_diff, #inline1_sse);\
+		print_xmm16u_array(prev_input_count, "SSE_PREV_INPUT", sse_prev_input);\
+		print_xmm16u_array(output_count, "SSE_OUT", sse_out);\
+		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline1_sse);\
 		compare_fn(check_last, scalar_prev_input, sse_prev_input, prev_input_count, 0, #inline1_sse);\
-		for(i = 0; i < sse_out_count; i++){\
+		for(i = 0; i < output_count; i++){\
 			sse_out[i] = _mm_setzero_si128();\
 			scalar_out[i] = _mm_setzero_si128();\
 		}\
 		dprintf("Checking " #inline2_sse "\n");\
+		print_xmm16u_array(input_count, "INPUT SCALAR ", input);\
+		print_xmm16u_array(prev_input_count, "SCALAR_PREV_INPUT", scalar_prev_input_copy);\
 		inline_scalar(input, scalar_prev_input_copy, scalar_out);\
+		print_xmm16u_array(prev_input_count, "SCALAR_PREV_INPUT", scalar_prev_input_copy);\
+		print_xmm16u_array(output_count, "SCALAR_OUT", scalar_out);\
+		print_xmm16u_array(input_count, "INPUT SSE ", input);\
+		print_xmm16u_array(prev_input_count, "SSE_PREV_INPUT", sse_prev_input_copy);\
 		inline2_sse(input, sse_prev_input_copy, sse_out);\
-		compare_fn(0, scalar_out, sse_out, sse_out_count, max_diff, #inline2_sse);\
+		print_xmm16u_array(prev_input_count, "SSE_PREV_INPUT", sse_prev_input_copy);\
+		print_xmm16u_array(output_count, "SSE_OUT", sse_out);\
+		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline2_sse);\
 		compare_fn(check_last, scalar_prev_input_copy, sse_prev_input_copy, prev_input_count, 0, #inline2_sse);\
 	} while (0)
 
-#define	 CHECK_SSE2_SSSE3_INLINE_2_IN_16BIT(inline_prefix, input, scalar_prev_input, sse_prev_input, prev_input_count, check_last, scalar_output, sse_output, sse_output_count, max_diff)	\
-	DO_CHECK_INLINE_2IN(inline_prefix ## scalar, inline_prefix ## sse2, inline_prefix ##sse2_ssse3, input, scalar_prev_input, sse_prev_input, prev_input_count, check_last, scalar_output, sse_output, sse_output_count, max_diff, compare_16bit_output)
+#define	 CHECK_SSE2_SSSE3_INLINE_2_IN_16BIT(inline_prefix, input, input_count, scalar_prev_input, sse_prev_input, prev_input_count, check_last, scalar_output, sse_output, sse_output_count, max_diff)	\
+	DO_CHECK_INLINE_2IN(inline_prefix ## scalar, inline_prefix ## sse2, inline_prefix ##sse2_ssse3, input, input_count, scalar_prev_input, sse_prev_input, prev_input_count, check_last, scalar_output, sse_output, sse_output_count, max_diff, compare_16bit_output)
 
