@@ -1,5 +1,40 @@
+/*
+ * inline-testing-common.c
+ *
+ * Copyright (C) 2012 PixFC Team (pixelfc@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public  License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include <stdint.h>
 #include "inline-testing-common.h"
+
+float       rgb_8bit_to_yuv_8bit_fr_coef[][3] =     { {0.299, 0.587, 0.114}, {-0.169, -0.331, 0.500}, {0.500, -0.419, -0.081} };
+uint32_t    rgb_8bit_to_yuv_8bit_fr_off[] =         { 0, 128, 128 };
+float       rgb_8bit_to_yuv_8bit_bt601_coef[][3] =  { {0.257, 0.504, 0.098}, {-0.148, -0.291, 0.439}, {0.439, -0.368, -0.071} };
+uint32_t    rgb_8bit_to_yuv_8bit_bt601_off[] =      { 16, 128, 128 };
+float       rgb_8bit_to_yuv_8bit_bt709_coef[][3] =  { {0.183, 0.614, 0.062}, {-0.101, -0.339, 0.439}, {0.439, -0.399, -0.040} };
+uint32_t    rgb_8bit_to_yuv_8bit_bt709_off[] =      {16, 128, 128 };;
+
+float       rgb_8bit_to_yuv_10bit_fr_coef[][3] =    { {1.196, 2.348, 0.456}, {-0.676, -1.324, 2}, {2, -1.676, -0.324} };
+uint32_t    rgb_8bit_to_yuv_10bit_fr_off[] =        { 0, 512, 512 };
+float       rgb_8bit_to_yuv_10bit_bt601_coef[][3] = { {1.028, 2.016, 0.392}, {-0.592, -1.164, 1.756}, {1.756, -1.472, -0.284} };
+uint32_t    rgb_8bit_to_yuv_10bit_bt601_off[] =     { 64, 512, 512 };
+float       rgb_8bit_to_yuv_10bit_bt709_coef[][3] = { {1.028, 2.016, 0.392},  {-0.404, -1.356, 1.756}, {1.756, -1.596, -0.160} };
+uint32_t    rgb_8bit_to_yuv_10bit_bt709_off[] =     { 64, 512, 512 };
+
 
 #ifdef DEBUG
 void	print_xmm8u_array(uint32_t count, char *prefix, void* array) {
