@@ -72,14 +72,6 @@ static void nnb_422_downsample_ag_rb_vectors_scalar(__m128i *input, __m128i* out
 }
 
 uint32_t	check_nnb_422_downsample_ag_rb_vectors() {
-/*    DECLARE_4_8BIT_VECT(input_8bit);
-	DECLARE_4_10BIT_VECT(input_10bit);
-    __m128i sse_output[2];
-    __m128i scalar_output[2];
-
-	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_ag_rb_vectors_, input_8bit, scalar_output, sse_output, 2, 0);
-	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_ag_rb_vectors_, input_10bit, scalar_output, sse_output, 2, 0);
-*/
     CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_ag_rb_vectors_, DECLARE_4_8BIT_VECT, 2, 0, compare_16bit_output);
     CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_ag_rb_vectors_, DECLARE_4_10BIT_VECT, 2, 0, compare_16bit_output);
 
@@ -133,14 +125,6 @@ void  nnb_422_downsample_r_g_b_vectors_scalar(__m128i* input, __m128i *output) {
 }
 
 uint32_t	check_nnb_422_downsample_r_g_b_vectors() {
-/*    DECLARE_3_8BIT_VECT(input_8bit);
-	DECLARE_3_10BIT_VECT(input_10bit);
-    __m128i sse_output[3];
-    __m128i scalar_output[3];
-
-	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_r_g_b_vectors_, input_8bit, scalar_output, sse_output, 3, 0);
-	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_r_g_b_vectors_, input_10bit, scalar_output, sse_output, 3, 0);
-*/
     CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 3, 0, compare_16bit_output);
     CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_r_g_b_vectors_, DECLARE_3_10BIT_VECT, 3, 0, compare_16bit_output);
 
