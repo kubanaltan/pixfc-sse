@@ -72,13 +72,16 @@ static void nnb_422_downsample_ag_rb_vectors_scalar(__m128i *input, __m128i* out
 }
 
 uint32_t	check_nnb_422_downsample_ag_rb_vectors() {
-    DECLARE_4_8BIT_VECT(input_8bit);
+/*    DECLARE_4_8BIT_VECT(input_8bit);
 	DECLARE_4_10BIT_VECT(input_10bit);
     __m128i sse_output[2];
     __m128i scalar_output[2];
 
 	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_ag_rb_vectors_, input_8bit, scalar_output, sse_output, 2, 0);
 	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_ag_rb_vectors_, input_10bit, scalar_output, sse_output, 2, 0);
+*/
+    CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_ag_rb_vectors_, DECLARE_4_8BIT_VECT, 2, 0, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_ag_rb_vectors_, DECLARE_4_10BIT_VECT, 2, 0, compare_16bit_output);
 
 	return 0;
 }
@@ -130,13 +133,16 @@ void  nnb_422_downsample_r_g_b_vectors_scalar(__m128i* input, __m128i *output) {
 }
 
 uint32_t	check_nnb_422_downsample_r_g_b_vectors() {
-    DECLARE_3_8BIT_VECT(input_8bit);
+/*    DECLARE_3_8BIT_VECT(input_8bit);
 	DECLARE_3_10BIT_VECT(input_10bit);
     __m128i sse_output[3];
     __m128i scalar_output[3];
 
 	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_r_g_b_vectors_, input_8bit, scalar_output, sse_output, 3, 0);
 	CHECK_SSE2_SSSE3_INLINE_1_IN_16BIT(nnb_422_downsample_r_g_b_vectors_, input_10bit, scalar_output, sse_output, 3, 0);
+*/
+    CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 3, 0, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(nnb_422_downsample_r_g_b_vectors_, DECLARE_3_10BIT_VECT, 3, 0, compare_16bit_output);
 
 	return 0;
 }
@@ -215,17 +221,8 @@ void  avg_422_downsample_ag_rb_vectors_n_save_previous_scalar(__m128i* input, __
 }
 
 uint32_t check_avg_422_downsample_ag_rb_vectors_n_save_previous() {
-	DECLARE_2_8BIT_VECT(scalar_prev_input_8bit);
-	DECLARE_2_8BIT_VECT(sse_prev_input_8bit);
-	DECLARE_4_8BIT_VECT(input_8bit);
-	DECLARE_2_10BIT_VECT(scalar_prev_input_10bit);
-	DECLARE_2_10BIT_VECT(sse_prev_input_10bit);
-    DECLARE_4_10BIT_VECT(input_10bit);
-    __m128i sse_output[2];
-    __m128i scalar_output[2];
-
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_ag_rb_vectors_n_save_previous_, input_8bit, 4, scalar_prev_input_8bit, sse_prev_input_8bit, 2, 2, scalar_output, sse_output, 2, MAX_DIFF_8BIT);
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_ag_rb_vectors_n_save_previous_, input_10bit, 4, scalar_prev_input_10bit, sse_prev_input_10bit, 2, 2, scalar_output, sse_output, 2, MAX_DIFF_8BIT);
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_ag_rb_vectors_n_save_previous_, DECLARE_4_8BIT_VECT, DECLARE_2_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output, 2);
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_ag_rb_vectors_n_save_previous_, DECLARE_4_10BIT_VECT, DECLARE_2_10BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output, 2);
 
     return 0;
 }
@@ -304,17 +301,8 @@ void  avg_422_downsample_r_g_b_vectors_n_save_previous_scalar(__m128i* input, __
 }
 
 uint32_t check_avg_422_downsample_r_g_b_vectors_n_save_previous() {
-    DECLARE_3_8BIT_VECT(scalar_prev_input_8bit);
-    DECLARE_3_8BIT_VECT(sse_prev_input_8bit);
-    DECLARE_3_8BIT_VECT(input_8bit);
-    DECLARE_3_10BIT_VECT(scalar_prev_input_10bit);
-    DECLARE_3_10BIT_VECT(sse_prev_input_10bit);
-    DECLARE_3_10BIT_VECT(input_10bit);
-    __m128i sse_output[3];
-    __m128i scalar_output[3];
-
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_r_g_b_vectors_n_save_previous_, input_8bit, 3, scalar_prev_input_8bit, sse_prev_input_8bit, 3, 1, scalar_output, sse_output, 3, MAX_DIFF_8BIT);
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_r_g_b_vectors_n_save_previous_, input_10bit, 3, scalar_prev_input_10bit, sse_prev_input_10bit, 3, 1, scalar_output, sse_output, 3, MAX_DIFF_8BIT);
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_r_g_b_vectors_n_save_previous_, DECLARE_3_8BIT_VECT, DECLARE_3_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output, 1);
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_r_g_b_vectors_n_save_previous_, DECLARE_3_10BIT_VECT, DECLARE_3_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output, 1);
 
     return 0;
 }
@@ -383,17 +371,9 @@ void  avg_422_downsample_first_r_g_b_vectors_n_save_previous_scalar(__m128i* inp
 }
 
 uint32_t check_avg_422_downsample_first_r_g_b_vectors_n_save_previous() {
-    DECLARE_3_8BIT_VECT(scalar_prev_input_8bit);
-    DECLARE_3_8BIT_VECT(sse_prev_input_8bit);
-    DECLARE_3_8BIT_VECT(input_8bit);
-    DECLARE_3_10BIT_VECT(scalar_prev_input_10bit);
-    DECLARE_3_10BIT_VECT(sse_prev_input_10bit);
-    DECLARE_3_10BIT_VECT(input_10bit);
-    __m128i sse_output[3];
-    __m128i scalar_output[3];
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_first_r_g_b_vectors_n_save_previous_, DECLARE_3_8BIT_VECT, DECLARE_3_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output, 1);
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_first_r_g_b_vectors_n_save_previous_, DECLARE_3_10BIT_VECT, DECLARE_3_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output, 1);
 
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_first_r_g_b_vectors_n_save_previous_, input_8bit, 3, scalar_prev_input_8bit, sse_prev_input_8bit, 3, 1, scalar_output, sse_output, 3, MAX_DIFF_8BIT);
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_first_r_g_b_vectors_n_save_previous_, input_10bit, 3, scalar_prev_input_10bit, sse_prev_input_10bit, 3, 1, scalar_output, sse_output, 3, MAX_DIFF_8BIT);
 
     return 0;
 }
@@ -467,17 +447,9 @@ void  avg_422_downsample_first_ag_rb_vectors_n_save_previous_scalar(__m128i* inp
 }
 
 uint32_t  check_avg_422_downsample_first_ag_rb_vectors_n_save_previous() {
-    DECLARE_2_8BIT_VECT(scalar_prev_input_8bit);
-    DECLARE_2_8BIT_VECT(sse_prev_input_8bit);
-    DECLARE_4_8BIT_VECT(input_8bit);
-    DECLARE_2_10BIT_VECT(scalar_prev_input_10bit);
-    DECLARE_2_10BIT_VECT(sse_prev_input_10bit);
-    DECLARE_4_10BIT_VECT(input_10bit);
-    __m128i sse_output[2];
-    __m128i scalar_output[2];
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_first_ag_rb_vectors_n_save_previous_, DECLARE_4_8BIT_VECT, DECLARE_2_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output, 2);
+    CHECK_SSE2_SSSE3_INLINE_1IN_1PREV(avg_422_downsample_first_ag_rb_vectors_n_save_previous_, DECLARE_4_10BIT_VECT, DECLARE_2_10BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output, 2);
 
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_first_ag_rb_vectors_n_save_previous_, input_8bit, 4, scalar_prev_input_8bit, sse_prev_input_8bit, 2, 2, scalar_output, sse_output, 2, MAX_DIFF_8BIT);
-    CHECK_SSE2_SSSE3_INLINE_1_IN_1_PREV_16BIT(avg_422_downsample_first_ag_rb_vectors_n_save_previous_, input_10bit, 4, scalar_prev_input_10bit, sse_prev_input_10bit, 2, 2, scalar_output, sse_output, 2, MAX_DIFF_8BIT);
 
     return 0;
 }
@@ -542,16 +514,8 @@ void  avg_420_downsample_r_g_b_vectors_scalar(__m128i* input1, __m128i* input2, 
 }
 
 uint32_t check_avg_420_downsample_r_g_b_vectors() {
-    DECLARE_3_8BIT_VECT(input1_8bit);
-    DECLARE_3_8BIT_VECT(input2_8bit);
-    DECLARE_3_10BIT_VECT(input1_10bit);
-    DECLARE_3_10BIT_VECT(input2_10bit);
-    __m128i scalar_output[3];
-    __m128i sse_output[3];
-
-
-    CHECK_SSE2_SSSE3_INLINE_2_IN_16BIT(avg_420_downsample_r_g_b_vectors_, input1_8bit, input2_8bit, 3, scalar_output, sse_output, 3, MAX_DIFF_8BIT);
-    CHECK_SSE2_SSSE3_INLINE_2_IN_16BIT(avg_420_downsample_r_g_b_vectors_, input1_10bit, input2_10bit, 3, scalar_output, sse_output, 3, MAX_DIFF_8BIT);
+    CHECK_SSE2_SSSE3_INLINE_2IN(avg_420_downsample_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_2IN(avg_420_downsample_r_g_b_vectors_, DECLARE_3_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
 
     return 0;
 }
@@ -627,19 +591,10 @@ void  avg_420_downsample_ag_rb_vectors_scalar(__m128i* input1, __m128i* input2, 
 }
 
 uint32_t check_avg_420_downsample_ag_rb_vectors() {
-    DECLARE_4_8BIT_VECT(input1_8bit);
-    DECLARE_4_8BIT_VECT(input2_8bit);
-    DECLARE_4_10BIT_VECT(input1_10bit);
-    DECLARE_4_10BIT_VECT(input2_10bit);
-    __m128i scalar_output[2];
-    __m128i sse_output[2];
-
-
-    CHECK_SSE2_SSSE3_INLINE_2_IN_16BIT(avg_420_downsample_ag_rb_vectors_, input1_8bit, input2_8bit, 4, scalar_output, sse_output, 2, MAX_DIFF_8BIT);
-    CHECK_SSE2_SSSE3_INLINE_2_IN_16BIT(avg_420_downsample_ag_rb_vectors_, input1_10bit, input2_10bit, 4, scalar_output, sse_output, 2, MAX_DIFF_8BIT);
+    CHECK_SSE2_SSSE3_INLINE_2IN(avg_420_downsample_ag_rb_vectors_, DECLARE_4_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_2IN(avg_420_downsample_ag_rb_vectors_, DECLARE_4_10BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output);
 
     return 0;
-
 }
 
 

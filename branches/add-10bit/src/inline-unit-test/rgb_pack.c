@@ -67,13 +67,16 @@ void pack_6_rgb_vectors_in_4_bgra_vectors_scalar(__m128i* input, __m128i* output
 };
 
 uint32_t    check_pack_6_rgb_vectors_in_4_bgra_vectors() {
-    DECLARE_6_8BIT_VECT(input_8bit);
+/*    DECLARE_6_8BIT_VECT(input_8bit);
     DECLARE_6_10BIT_VECT(input_10bit);
     __m128i scalar_out[4];
     __m128i sse_out[4];
 
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_4_bgra_vectors_scalar, pack_6_rgb_vectors_in_4_bgra_vectors_sse2, input_8bit, scalar_out, sse_out, 4, MAX_DIFF_8BIT, compare_8bit_output);
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_4_bgra_vectors_scalar, pack_6_rgb_vectors_in_4_bgra_vectors_sse2, input_10bit, scalar_out, sse_out, 4, MAX_DIFF_8BIT, compare_8bit_output);
+*/
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_4_bgra_vectors_scalar, pack_6_rgb_vectors_in_4_bgra_vectors_sse2, DECLARE_6_8BIT_VECT, 4, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_4_bgra_vectors_scalar, pack_6_rgb_vectors_in_4_bgra_vectors_sse2, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_8BIT, compare_8bit_output);
 
     return 0;
 }
@@ -124,15 +127,17 @@ void pack_6_rgb_vectors_in_4_argb_vectors_scalar(__m128i* input, __m128i* output
 }
 
 uint32_t    check_pack_6_rgb_vectors_in_4_argb_vectors() {
-    DECLARE_6_8BIT_VECT(input_8bit);
+/*    DECLARE_6_8BIT_VECT(input_8bit);
     DECLARE_6_10BIT_VECT(input_10bit);
     __m128i scalar_out[4];
     __m128i sse_out[4];
 
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_4_argb_vectors_scalar, pack_6_rgb_vectors_in_4_argb_vectors_sse2, input_8bit, scalar_out, sse_out, 4, MAX_DIFF_8BIT, compare_8bit_output);
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_4_argb_vectors_scalar, pack_6_rgb_vectors_in_4_argb_vectors_sse2, input_10bit, scalar_out, sse_out, 4, MAX_DIFF_8BIT, compare_8bit_output);
+*/
 
-
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_4_argb_vectors_scalar, pack_6_rgb_vectors_in_4_argb_vectors_sse2, DECLARE_6_8BIT_VECT, 4, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_4_argb_vectors_scalar, pack_6_rgb_vectors_in_4_argb_vectors_sse2, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_8BIT, compare_8bit_output);
     return 0;
 }
 
@@ -181,7 +186,7 @@ void pack_6_rgb_vectors_in_3_rgb24_vectors_scalar(__m128i* input, __m128i* outpu
 }
 
 uint32_t check_6_rgb_vectors_in_3_rgb24_vectors() {
-    DECLARE_6_8BIT_VECT(input_8bit);
+/*    DECLARE_6_8BIT_VECT(input_8bit);
     DECLARE_6_10BIT_VECT(input_10bit);
     __m128i scalar_out[3];
     __m128i sse_out[3];
@@ -192,7 +197,15 @@ uint32_t check_6_rgb_vectors_in_3_rgb24_vectors() {
 
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_3_rgb24_vectors_scalar, pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, input_8bit, scalar_out, sse_out, 3, MAX_DIFF_8BIT, compare_8bit_output);
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_3_rgb24_vectors_scalar, pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, input_10bit, scalar_out, sse_out, 3, MAX_DIFF_8BIT, compare_8bit_output);
+*/
 
+
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_rgb24_vectors_scalar, pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking, DECLARE_6_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_rgb24_vectors_scalar, pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking, DECLARE_6_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
+
+
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_rgb24_vectors_scalar, pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, DECLARE_6_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_rgb24_vectors_scalar, pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, DECLARE_6_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
     return 0;
 }
 
@@ -239,11 +252,10 @@ void pack_6_rgb_vectors_in_3_bgr24_vectors_scalar(__m128i* input, __m128i* outpu
 }
 
 uint32_t check_6_rgb_vectors_in_3_bgr24_vectors() {
-    DECLARE_6_8BIT_VECT(input_8bit);
+/*    DECLARE_6_8BIT_VECT(input_8bit);
     DECLARE_6_10BIT_VECT(input_10bit);
     __m128i scalar_out[3];
     __m128i sse_out[3];
-
 
 
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_3_bgr24_vectors_scalar, pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, input_8bit, scalar_out, sse_out, 3, MAX_DIFF_8BIT, compare_8bit_output);
@@ -252,6 +264,13 @@ uint32_t check_6_rgb_vectors_in_3_bgr24_vectors() {
 
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_3_bgr24_vectors_scalar, pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, input_8bit, scalar_out, sse_out, 3, MAX_DIFF_8BIT, compare_8bit_output);
     CHECK_INLINE_1_IN(pack_6_rgb_vectors_in_3_bgr24_vectors_scalar, pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, input_10bit, scalar_out, sse_out, 3, MAX_DIFF_8BIT, compare_8bit_output);
+*/
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_bgr24_vectors_scalar, pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, DECLARE_6_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_bgr24_vectors_scalar, pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, DECLARE_6_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
+
+
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_bgr24_vectors_scalar, pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, DECLARE_6_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_6_rgb_vectors_in_3_bgr24_vectors_scalar, pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, DECLARE_6_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_8bit_output);
 
     return 0;
 }

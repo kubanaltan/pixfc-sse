@@ -23,47 +23,26 @@
 
 #define CHECK_FN_8BIT_3IN(fn_suffix, out_count)\
     uint32_t    check_ ## fn_suffix() {\
-        DECLARE_3_8BIT_VECT(input_8bit);\
-        __m128i scalar_out[out_count];\
-        __m128i sse_out[out_count];\
-        \
-        CHECK_INLINE_1_IN(fn_suffix ## _scalar, fn_suffix ## _sse2, input_8bit, scalar_out, sse_out, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
-        \
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_3_8BIT_VECT, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
         return 0;\
     }
 
 #define CHECK_FN_10BIT_3IN(fn_suffix, out_count)\
     uint32_t    check_ ## fn_suffix() {\
-        DECLARE_3_8BIT_VECT(input_8bit);\
-        DECLARE_3_10BIT_VECT(input_10bit);\
-        __m128i scalar_out[out_count];\
-        __m128i sse_out[out_count];\
-        \
-        CHECK_INLINE_1_IN(fn_suffix ## _scalar, fn_suffix ## _sse2, input_8bit, scalar_out, sse_out, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
-        CHECK_INLINE_1_IN(fn_suffix ## _scalar, fn_suffix ## _sse2, input_10bit, scalar_out, sse_out, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
-        \
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_3_8BIT_VECT, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_3_10BIT_VECT, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
         return 0;\
     }
 
 #define CHECK_FN_8BIT_4IN(fn_suffix, out_count)\
     uint32_t    check_ ## fn_suffix() {\
-        DECLARE_4_8BIT_VECT(input_8bit);\
-        __m128i scalar_out[out_count];\
-        __m128i sse_out[out_count];\
-        \
-        CHECK_INLINE_1_IN(fn_suffix ## _scalar, fn_suffix ## _sse2, input_8bit, scalar_out, sse_out, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
-        \
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_4_8BIT_VECT, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
         return 0;\
     }
 
 #define CHECK_FN_8BIT_2IN(fn_suffix, out_count)\
     uint32_t    check_ ## fn_suffix() {\
-        DECLARE_2_8BIT_VECT(input_8bit);\
-        __m128i scalar_out[out_count];\
-        __m128i sse_out[out_count];\
-        \
-        CHECK_INLINE_1_IN(fn_suffix ## _scalar, fn_suffix ## _sse2, input_8bit, scalar_out, sse_out, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
-        \
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_2_8BIT_VECT, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
         return 0;\
     }
 
