@@ -81,6 +81,14 @@ int main(int argc, char **argv) {
     check_convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709();
 
 
+    // YUV pack
+    check_pack_4_y_uv_422_vectors_in_2_yuyv_vectors();
+    check_pack_4_y_uv_422_vectors_in_2_uyvy_vectors();
+    check_pack_4_y_uv_422_vectors_in_yuvp_lo_vectors();
+    check_pack_4_y_uv_422_vectors_in_yuvp_hi_vectors();
+    check_pack_2_y_vectors_to_1_y_vector();
+    check_pack_4_uv_vectors_to_yup_vectors();
+
 
 	return 0;
 }

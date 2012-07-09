@@ -26,7 +26,7 @@ uint32_t    rgb_8bit_to_yuv_8bit_fr_off[] =         { 0, 128, 128 };
 float       rgb_8bit_to_yuv_8bit_bt601_coef[][3] =  { {0.257, 0.504, 0.098}, {-0.148, -0.291, 0.439}, {0.439, -0.368, -0.071} };
 uint32_t    rgb_8bit_to_yuv_8bit_bt601_off[] =      { 16, 128, 128 };
 float       rgb_8bit_to_yuv_8bit_bt709_coef[][3] =  { {0.183, 0.614, 0.062}, {-0.101, -0.339, 0.439}, {0.439, -0.399, -0.040} };
-uint32_t    rgb_8bit_to_yuv_8bit_bt709_off[] =      {16, 128, 128 };;
+uint32_t    rgb_8bit_to_yuv_8bit_bt709_off[] =      { 16, 128, 128 };
 
 float       rgb_8bit_to_yuv_10bit_fr_coef[][3] =    { {1.196, 2.348, 0.456}, {-0.676, -1.324, 2}, {2, -1.676, -0.324} };
 uint32_t    rgb_8bit_to_yuv_10bit_fr_off[] =        { 0, 512, 512 };
@@ -65,9 +65,14 @@ void   compare_8bit_output(uint8_t check_last, void *scalar_out, void *sse_out, 
 	uint8_t* sse = (uint8_t*) sse_out;
 	uint8_t  index;
 	for(index = 0; index < 16 * sse_out_count; index++) {
-		if ((check_last != 0) && (16 - (index % 16) > check_last))
-			continue;
-		if (abs(scalar[index] - sse[index]) > max_diff) {
+		if (check_last != 0) {
+             if (((check_last > 0) && (16 - (index % 16) > check_last))
+                    || ((check_last < 0) && ((index % 16) > (-check_last))))
+    			continue;
+
+        }
+
+        if (abs(scalar[index] - sse[index]) > max_diff) {
 			dprintf("== %s\n", prefix);
 			dprintf("Value @ %hhu in '%s' vector %u differs by %u: sse: %hhu - scalar: %hhu\n", (index % 16), check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 16), abs(sse[index]-scalar[index]), sse[index], scalar[index]);
 			print_xmm8u("SSE   ", (__m128i*) &sse[(index / 16) * 16]);
@@ -77,13 +82,41 @@ void   compare_8bit_output(uint8_t check_last, void *scalar_out, void *sse_out, 
 	}
 }
 
+void   compare_10bit_le_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t sse_out_count, uint32_t max_diff, char *prefix) {
+	uint32_t* scalar = (uint32_t*) scalar_out;
+	uint32_t* sse = (uint32_t*) sse_out;
+	uint8_t  index;
+
+    // there are 12 10bit values per __m128i vector
+	for(index = 0; index < sse_out_count * 12; index++) {
+		if (check_last != 0) {
+             if (((check_last > 0) && (12 - (index % 12) > check_last))
+                    || ((check_last < 0) && ((index % 12) > (-check_last))))
+    			continue;   
+        }
+
+        if (abs(scalar[index] - sse[index]) > max_diff) {
+			dprintf("== %s\n", prefix);
+			dprintf("Value @ %hhu in '%s' vector %u differs by %u: sse: %hhu - scalar: %hhu\n", (index % 12), check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 12), abs(sse[index]-scalar[index]), sse[index], scalar[index]);
+			print_xmm8u("SSE   ", (__m128i*) &sse[(index / 16) * 16]);
+			print_xmm8u("Scalar", (__m128i*) &scalar[(index / 16) * 16]);
+			break;
+		}
+	}
+}
+
+
 void  compare_16bit_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t sse_out_count, uint32_t max_diff, char *prefix){
 	uint16_t* scalar = (uint16_t*) scalar_out;
 	uint16_t* sse = (uint16_t*) sse_out;
 	uint8_t  index;
 	for(index = 0; index < 8 * sse_out_count; index++) {
-		if ((check_last != 0) && (8 - (index % 8) > check_last))
-			continue;
+        if (check_last != 0) {
+             if (((check_last > 0) && (8 - (index % 8) > check_last))
+                    || ((check_last < 0) && ((index % 8) > (-check_last))))
+    			continue;
+
+        }	
 		if (abs(scalar[index] - sse[index]) > max_diff) {
 			dprintf("== %s\n", prefix);
 			dprintf("Value @ %hhu in '%s' vector %u differs by %u: sse: %hu - scalar: %hu\n", (index % 8), check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 8), abs(sse[index]-scalar[index]), sse[index], scalar[index]);
