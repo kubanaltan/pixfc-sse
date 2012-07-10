@@ -20,6 +20,7 @@
 
 #include "inline-testing-common.h"
 
+
 #define GENERATE_UNALIGNED_INLINES 0
 #include "yuv_pack.h"
 
@@ -438,7 +439,9 @@ void    pack_6_y_uv_vectors_to_4_v210_vectors_scalar(__m128i* input, __m128i* ou
 }
 
 uint32_t    check_pack_6_y_uv_vectors_to_4_v210_vectors() {
-    
+    CHECK_INLINE_1IN(pack_6_y_uv_vectors_to_4_v210_vectors_scalar, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_8BIT, compare_10bit_le_output);
+    CHECK_INLINE_1IN(pack_6_y_uv_vectors_to_4_v210_vectors_scalar, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3_sse41, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_8BIT, compare_10bit_le_output);
+
     return 0;
 }
 

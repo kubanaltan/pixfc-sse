@@ -378,6 +378,27 @@ INLINE_NAME(pack_4_uv_vectors_to_yup_vectors_sse2, __m128i* in_4_uv_vectors, __m
 	// V1 V2	V3 V4 	V5 V6	V7 V8	V9 V10	V11 V12	V13 V14 V15 V16
 }
 
+#ifdef FAKE_SSE41_BLENDV
+#define _mm_blendv_epi8 _fake_mm_blendv_epi8
+__m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
+    char *m = (char *)&mask;
+    __m128i result = {0x0LL, 0x0LL};
+    char *dest = (char*) &result;
+    char *s1 = (char*)&v1;
+    char *s2 = (char*)&v2;
+    int i = 0;
+
+    for (i = 0; i < 16; i++) {
+        if (m[i] & 0xFF)
+            dest[i] = s1[i];
+        else
+            dest[i] = s2[i];
+    }
+
+    return result;
+}
+#endif
+
 
 /*
  * Pack 2 Y, UV vectors into 1 v210 vector (6 pixels)

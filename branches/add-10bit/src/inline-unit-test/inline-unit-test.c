@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
     check_pack_4_y_uv_422_vectors_in_yuvp_hi_vectors();
     check_pack_2_y_vectors_to_1_y_vector();
     check_pack_4_uv_vectors_to_yup_vectors();
-
+    check_pack_6_y_uv_vectors_to_4_v210_vectors();
 
 	return 0;
 }

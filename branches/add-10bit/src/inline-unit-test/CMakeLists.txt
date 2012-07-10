@@ -29,6 +29,10 @@ if(NOT WIN32)
 
 endif(NOT WIN32)
 
+if(FAKE_SSE4)
+    add_definitions(-DFAKE_SSE41_BLENDV)
+endif(FAKE_SSE4)
+
 # Check if we are building in debug mode
 if(DEBUG)
         include_directories(AFTER .)

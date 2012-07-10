@@ -128,9 +128,11 @@ extern uint32_t     rgb_8bit_to_yuv_10bit_bt709_off[];
                                 fflush(stderr); } while(0)
 #ifdef DEBUG
 	void	print_xmm8u_array(uint32_t count, char *prefix, void *array);
+	void	print_xmm10leu_array(uint32_t count, char *prefix, void *array);
 	void	print_xmm16u_array(uint32_t count, char *prefix, void *array);
 #else
 	#define print_xmm8u_array(...)
+	#define print_xmm10leu_array(...)
 	#define print_xmm16u_array(...)
 #endif
 
@@ -138,7 +140,7 @@ extern uint32_t     rgb_8bit_to_yuv_10bit_bt709_off[];
  * if check_last is negative, then checck first
  */
 void	compare_8bit_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
-void	compare_v210_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
+void	compare_10bit_le_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
 void	compare_16bit_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
 
 #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof((arr)[0]))
@@ -182,11 +184,11 @@ void	compare_16bit_output(uint8_t check_last, void *scalar_out, void *sse_out, u
         __m128i scalar_out[output_count];\
         __m128i sse_out[output_count];\
 		dprintf("Checking " #inline_sse "\n");\
-        /*print_xmm16u_array(ARRAY_SIZE(input), "INPUT", input); */\
+        print_xmm10leu_array(ARRAY_SIZE(input), "INPUT", input);\
 		inline_scalar(input, scalar_out);\
-        /*print_xmm16u_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out); */\
+        print_xmm10leu_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out);\
 		inline_sse(input, sse_out);\
-        /*print_xmm16u_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out); */\
+        print_xmm10leu_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);\
 		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse);\
 	} while (0)
 
