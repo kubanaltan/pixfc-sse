@@ -403,7 +403,7 @@ void    pack_6_y_uv_vectors_to_4_v210_vectors_scalar(__m128i* input, __m128i* ou
     uint32_t *out = (uint32_t*) output;
     uint32_t pixel_count = 0;
 
-    while(pixel_count <= 24) {
+    while(pixel_count < 24) {
         *out = CLIP_10BIT_PIXEL(in[8]) & 0x3FF;
         *out |= (CLIP_10BIT_PIXEL(in[0]) & 0x3FF) << 10;
         *(out++) |= (CLIP_10BIT_PIXEL(in[8 + 1]) & 0x3FF) << 20;
@@ -433,9 +433,7 @@ void    pack_6_y_uv_vectors_to_4_v210_vectors_scalar(__m128i* input, __m128i* ou
         in += 2;
         if (pixel_count % 8 == 0)
             in += 8;
- 
     }
-
 }
 
 uint32_t    check_pack_6_y_uv_vectors_to_4_v210_vectors() {

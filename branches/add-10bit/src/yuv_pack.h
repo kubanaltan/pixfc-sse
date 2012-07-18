@@ -390,9 +390,9 @@ __m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
 
     for (i = 0; i < 16; i++) {
         if (m[i] & 0xFF)
-            dest[i] = s1[i];
-        else
             dest[i] = s2[i];
+        else
+            dest[i] = s1[i];
     }
 
     return result;

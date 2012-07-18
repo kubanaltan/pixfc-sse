@@ -184,11 +184,11 @@ void	compare_16bit_output(uint8_t check_last, void *scalar_out, void *sse_out, u
         __m128i scalar_out[output_count];\
         __m128i sse_out[output_count];\
 		dprintf("Checking " #inline_sse "\n");\
-        print_xmm10leu_array(ARRAY_SIZE(input), "INPUT", input);\
+        /*print_xmm10leu_array(ARRAY_SIZE(input), "INPUT", input); */\
 		inline_scalar(input, scalar_out);\
-        print_xmm10leu_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out);\
+        /*print_xmm10leu_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out); */\
 		inline_sse(input, sse_out);\
-        print_xmm10leu_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);\
+        /*print_xmm10leu_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out); */\
 		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse);\
 	} while (0)
 
