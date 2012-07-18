@@ -38,7 +38,6 @@ int main(int argc, char **argv) {
     check_6_rgb_vectors_in_3_rgb24_vectors();
     check_6_rgb_vectors_in_3_bgr24_vectors();
 
-
     // RGB unpack
     check_unpack_argb_to_ag_rb_vectors();
     check_unpack_argb_to_r_g_b_vectors();
@@ -81,6 +80,7 @@ int main(int argc, char **argv) {
     check_convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709();
 
 
+    //
     // YUV pack
     check_pack_4_y_uv_422_vectors_in_2_yuyv_vectors();
     check_pack_4_y_uv_422_vectors_in_2_uyvy_vectors();
@@ -90,5 +90,10 @@ int main(int argc, char **argv) {
     check_pack_4_uv_vectors_to_yup_vectors();
     check_pack_6_y_uv_vectors_to_4_v210_vectors();
 
+    // YUV repack
+    check_repack_yuv422p_to_yuyv();
+    check_repack_yuv422p_to_uyvy();
+    check_repack_yuyv_to_yuv422p();
+    check_repack_uyvy_to_yuv422p();
 	return 0;
 }
