@@ -36,6 +36,21 @@ float       rgb_8bit_to_yuv_10bit_bt709_coef[][3] = { {1.028, 2.016, 0.392},  {-
 uint32_t    rgb_8bit_to_yuv_10bit_bt709_off[] =     { 64, 512, 512 };
 
 
+float       yuv_8bit_to_rgb_8bit_fr_coef[][3] =     { {1,     0,     1.4  }, {1,     -0.343, -0.711}, {1,     1.765, 0} };
+uint32_t    yuv_8bit_to_rgb_8bit_fr_off[] =         { 0, 128, 128 };
+float       yuv_8bit_to_rgb_8bit_bt601_coef[][3] =  { {1.164, 0,     1.596}, {1.164, -0.392, -0.813}, {1.164, 3.017, 0} };
+uint32_t    yuv_8bit_to_rgb_8bit_bt601_off[] =      { 16, 128, 128};
+float       yuv_8bit_to_rgb_8bit_bt709_coef[][3] =  { {1.164, 0,     1.793}, {1.164, -0.213, -0.533}, {1.164, 2.112, 0} };
+uint32_t    yuv_8bit_to_rgb_8bit_bt709_off[] =      { 16, 128, 128};
+
+float       yuv_10bit_to_rgb_8bit_fr_coef[][3] =    { {0.250, 0,     0.350}, {0.250, -0.086, -0.178}, {0.250, 0.441, 0} };
+uint32_t    yuv_10bit_to_rgb_8bit_fr_off[] =        {;
+float       yuv_10bit_to_rgb_8bit_bt601_coef[][3];
+uint32_t    yuv_10bit_to_rgb_8bit_bt601_off[];
+float       yuv_10bit_to_rgb_8bit_bt709_coef[][3];
+uint32_t    yuv_10bit_to_rgb_8bit_bt709_off[];
+
+
 #ifdef DEBUG
 void	print_xmm8u_array(uint32_t count, char *prefix, void* array) {
 	uint32_t	index = 0;
