@@ -110,5 +110,12 @@ int main(int argc, char **argv) {
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors();
 	
+	// YUV unpack
+	check_unpack_yuyv_to_y_uv_vectors();
+	check_unpack_uyvy_to_y_uv_vectors();
+	check_unpack_yuv42Xp_to_2_y_vectors();
+	check_unpack_low_yuv42Xp_to_uv_vector();
+	check_unpack_high_yuv42Xp_to_uv_vector();
+	
 	return 0;
 }
