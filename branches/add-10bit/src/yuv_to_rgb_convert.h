@@ -1104,7 +1104,7 @@ EXTERN_INLINE void fn_name(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_
 	_M(uvVector) = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(uvVector));\
 	_M(yVector) = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(yVector));\
 	_M(yVector) = _mm_slli_epi16(_M(yVector), (16-yCoefLeftShift));\
-	_M(yVector) = _mm_mulhi_epu16(_M(yVector), _M(yCoeffs));\
+	_M(yVector) = _mm_mulhi_epi16(_M(yVector), _M(yCoeffs));\
 	_M(uvRCoeffs) = _mm_madd_epi16(_M(uvVector), _M(uvRCoeffs));\
 	_M(uvRCoeffs) = _mm_srai_epi32(_M(uvRCoeffs), uvRCoefLeftShift);\
 	_M(uvRCoeffs) = _mm_shuffle_epi8 (_M(uvRCoeffs), _M(shuffMask));\
@@ -1131,7 +1131,7 @@ EXTERN_INLINE void fn_name(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_
 	M128I(yVector, yOffset, yOffset);\
 	_M(uvVector) = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(uvVector));\
 	_M(yVector) = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(yVector));\
-	_M(yVector) = _mm_mulhi_epu16(_M(yVector), _M(yCoeffs));\
+	_M(yVector) = _mm_mulhi_epi16(_M(yVector), _M(yCoeffs));\
 	_M(uvRCoeffs) = _mm_madd_epi16(_M(uvVector), _M(uvRCoeffs));\
 	_M(uvRCoeffs) = _mm_srai_epi32(_M(uvRCoeffs), uvRCoefLeftShift);\
 	_M(uvRCoeffs) = _mm_shuffle_epi8 (_M(uvRCoeffs), _M(shuffMask));\

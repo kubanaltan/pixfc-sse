@@ -27,6 +27,8 @@
 #include "common.h"
 
 #define MAX_DIFF_8BIT      2
+#define MAX_DIFF_10BIT     3
+
 
 
 // 0		15		16		235		236		240		241     255
@@ -36,6 +38,16 @@
 // 129		234		235		236		240		241		254		255
 #define DECLARE_2_8BIT_VECT(var)	__m128i (var)[] = { { 0x000F000200010000LL, 0x0080007F00110010LL }, \
 	                                                    { 0x00EC00EB00EA0081LL, 0x00FF00FE00F100F0LL } }
+
+// 0		1		2		15		16		17		127		128
+// 0		0		15		15		16		16		235		235
+#define DECLARE_1_Y_UV_8BIT_VECT1(var)	__m128i (var)[] = { { 0x000F000200010000LL, 0x0080007F00110010LL }, \
+															{ 0x000F000F00000000LL, 0x00EB00EB00100010LL } }
+
+// 129		234		235		236		240		241		254		255
+// 236		236		240		240		241     241		255		255
+#define DECLARE_1_Y_UV_8BIT_VECT2(var)	__m128i (var)[] = { { 0x00EC00EB00EA0081LL, 0x00FF00FE00F100F0LL }, \
+															{ 0x00F000F000EC00ECLL, 0x00FF00FF00F100F1LL } }
 
 // 0		15		16		235		236		240		241     255
 // 0		15		16		235		236		240		241     255
@@ -75,7 +87,18 @@
 // 513		939		940		941		960		961		1022	1023
 #define DECLARE_2_10BIT_VECT(var)	__m128i (var)[] = { { 0x003F000200010000LL, 0x020001FF00410040LL }, \
 														{ 0x03AD03AC03AB0201LL, 0x03FF03FE03C103C0LL }, }
- 
+
+// 0		1		2		63		64		65		511		512
+// 0		0		63		63		64		64		940		940
+#define DECLARE_1_Y_UV_10BIT_VECT1(var)	__m128i (var)[] = { { 0x003F000200010000LL, 0x020001FF00410040LL }, \
+															{ 0x003F003F00000000LL, 0x03AC03AC00400040LL }, }
+
+// 513		939		940		941		960		961		1022	1023
+// 941		641		960		960		961     961		1023	1023
+#define DECLARE_1_Y_UV_10BIT_VECT2(var)	__m128i (var)[] = { { 0x03AD03AC03AB0201LL, 0x03FF03FE03C103C0LL }, \
+															{ 0x03C003C003AD03ADLL, 0x03FF03FF03C103C1LL }, }
+
+
 // 0		63		64		940		941		960		961     1023
 // 0		63		64		940		941		960		961     1023
 // 0		63		64		940		941		960		961     1023
@@ -107,33 +130,33 @@
 
 
 extern float        rgb_8bit_to_yuv_8bit_fr_coef[][3];
-extern uint32_t     rgb_8bit_to_yuv_8bit_fr_off[];
+extern int32_t      rgb_8bit_to_yuv_8bit_fr_off[];
 extern float        rgb_8bit_to_yuv_8bit_bt601_coef[][3];
-extern uint32_t     rgb_8bit_to_yuv_8bit_bt601_off[];
+extern int32_t      rgb_8bit_to_yuv_8bit_bt601_off[];
 extern float        rgb_8bit_to_yuv_8bit_bt709_coef[][3];
-extern uint32_t     rgb_8bit_to_yuv_8bit_bt709_off[];
+extern int32_t      rgb_8bit_to_yuv_8bit_bt709_off[];
 
 extern float        rgb_8bit_to_yuv_10bit_fr_coef[][3];
-extern uint32_t     rgb_8bit_to_yuv_10bit_fr_off[];
+extern int32_t      rgb_8bit_to_yuv_10bit_fr_off[];
 extern float        rgb_8bit_to_yuv_10bit_bt601_coef[][3];
-extern uint32_t     rgb_8bit_to_yuv_10bit_bt601_off[];
+extern int32_t      rgb_8bit_to_yuv_10bit_bt601_off[];
 extern float        rgb_8bit_to_yuv_10bit_bt709_coef[][3];
-extern uint32_t     rgb_8bit_to_yuv_10bit_bt709_off[];
+extern int32_t      rgb_8bit_to_yuv_10bit_bt709_off[];
 
 
 extern float        yuv_8bit_to_rgb_8bit_fr_coef[][3];
-extern uint32_t     yuv_8bit_to_rgb_8bit_fr_off[];
+extern int32_t      yuv_8bit_to_rgb_8bit_fr_off[];
 extern float        yuv_8bit_to_rgb_8bit_bt601_coef[][3];
-extern uint32_t     yuv_8bit_to_rgb_8bit_bt601_off[];
+extern int32_t      yuv_8bit_to_rgb_8bit_bt601_off[];
 extern float        yuv_8bit_to_rgb_8bit_bt709_coef[][3];
-extern uint32_t     yuv_8bit_to_rgb_8bit_bt709_off[];
+extern int32_t      yuv_8bit_to_rgb_8bit_bt709_off[];
 
-extern float        yuv_8bit_to_rgb_10bit_fr_coef[][3];
-extern uint32_t     yuv_8bit_to_rgb_10bit_fr_off[];
-extern float        yuv_8bit_to_rgb_10bit_bt601_coef[][3];
-extern uint32_t     yuv_8bit_to_rgb_10bit_bt601_off[];
-extern float        yuv_8bit_to_rgb_10bit_bt709_coef[][3];
-extern uint32_t     yuv_8bit_to_rgb_10bit_bt709_off[];
+extern float        yuv_10bit_to_rgb_8bit_fr_coef[][3];
+extern int32_t      yuv_10bit_to_rgb_8bit_fr_off[];
+extern float        yuv_10bit_to_rgb_8bit_bt601_coef[][3];
+extern int32_t      yuv_10bit_to_rgb_8bit_bt601_off[];
+extern float        yuv_10bit_to_rgb_8bit_bt709_coef[][3];
+extern int32_t      yuv_10bit_to_rgb_8bit_bt709_off[];
 
 
 #define dprintf(fmt, ...)  do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
@@ -144,18 +167,20 @@ extern uint32_t     yuv_8bit_to_rgb_10bit_bt709_off[];
 	void	print_xmm8u_array(uint32_t count, char *prefix, void *array);
 	void	print_xmm10leu_array(uint32_t count, char *prefix, void *array);
 	void	print_xmm16u_array(uint32_t count, char *prefix, void *array);
+	void	print_xmm16_array(uint32_t count, char *prefix, void *array);
 #else
 	#define print_xmm8u_array(...)
 	#define print_xmm10leu_array(...)
 	#define print_xmm16u_array(...)
+	#define print_xmm16_array(...)
 #endif
 
 /*
- * if check_last is negative, then checck first
+ * check_last specifies how many of the last values should be check. If check_last is negative, then check from start. If 0, check all values.
  */
-void	compare_8bit_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
-void	compare_10bit_le_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
-void	compare_16bit_output(uint8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
+void	compare_8bit_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
+void	compare_10bit_le_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
+void	compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
 
 #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof((arr)[0]))
 
@@ -220,12 +245,12 @@ void	compare_16bit_output(uint8_t check_last, void *scalar_out, void *sse_out, u
         __m128i scalar_out[output_count];\
         __m128i sse_out[output_count];\
 		dprintf("Checking " #inline_sse "\n");\
-        /*print_xmm10leu_array(ARRAY_SIZE(input), "INPUT", input); */\
+        /* print_xmm16u_array(ARRAY_SIZE(input), "INPUT", input); */\
 		inline_scalar(input, scalar_out);\
-        /*print_xmm10leu_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out); */\
+        /* print_xmm16_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out); */\
 		inline_sse(input, sse_out);\
-        /*print_xmm10leu_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out); */\
-		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse);\
+        /* print_xmm16_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);\
+		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse); */\
 	} while (0)
 
 
