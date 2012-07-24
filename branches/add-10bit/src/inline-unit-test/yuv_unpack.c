@@ -59,8 +59,8 @@ void	unpack_yuyv_to_y_uv_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t check_unpack_yuyv_to_y_uv_vectors() {
-	CHECK_INLINE_1IN(unpack_yuyv_to_y_uv_vectors_scalar, unpack_yuyv_to_y_uv_vectors_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);	
-	CHECK_INLINE_1IN(unpack_yuyv_to_y_uv_vectors_scalar, unpack_yuyv_to_y_uv_vectors_sse2_ssse3, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);	
+	CHECK_INLINE_1IN(unpack_yuyv_to_y_uv_vectors_scalar, unpack_yuyv_to_y_uv_vectors_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output);	
+	CHECK_INLINE_1IN(unpack_yuyv_to_y_uv_vectors_scalar, unpack_yuyv_to_y_uv_vectors_sse2_ssse3, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output);	
 	
 	return 0;
 }
@@ -101,8 +101,8 @@ void	unpack_uyvy_to_y_uv_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t check_unpack_uyvy_to_y_uv_vectors() {
-	CHECK_INLINE_1IN(unpack_uyvy_to_y_uv_vectors_scalar, unpack_uyvy_to_y_uv_vectors_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);	
-	CHECK_INLINE_1IN(unpack_uyvy_to_y_uv_vectors_scalar, unpack_uyvy_to_y_uv_vectors_sse2_ssse3, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);
+	CHECK_INLINE_1IN(unpack_uyvy_to_y_uv_vectors_scalar, unpack_uyvy_to_y_uv_vectors_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output);	
+	CHECK_INLINE_1IN(unpack_uyvy_to_y_uv_vectors_scalar, unpack_uyvy_to_y_uv_vectors_sse2_ssse3, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output);
 	
 	return 0;
 }
@@ -129,18 +129,22 @@ uint32_t check_unpack_uyvy_to_y_uv_vectors() {
  * yVect2
  * Y9  0	Y10  0	Y11  0	Y12  0	Y13  0	Y14  0	Y15  0	Y16  0
  */
-void	unpack_yuv42Xp_to_2_y_vectors_scalar(__m128i* input, __m128i* output) {
+void	unpack_yuv42Xp_to_2_y_vectors_scalar(__m128i* input, __m128i* output1, __m128i *output2) {
 	uint8_t *in = (uint8_t *) input;
-	uint16_t *out = (uint16_t *) output;
+	uint16_t *out = (uint16_t *) output1;
+
 	uint32_t pixel_count;
 	
 	for(pixel_count = 0; pixel_count < 16; pixel_count++) {
+        if (pixel_count == 8)
+            out = (uint16_t *) output2;
+
 		*out++ = *in++;
 	}
 }
 
 uint32_t check_unpack_yuv42Xp_to_2_y_vectors() {
-	CHECK_INLINE_1IN(unpack_yuv42Xp_to_2_y_vectors_scalar, unpack_yuv42Xp_to_2_y_vectors_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);	
+	CHECK_INLINE_1IN_2OUT(unpack_yuv42Xp_to_2_y_vectors_scalar, unpack_yuv42Xp_to_2_y_vectors_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output, 0, 0);	
 	
 	return 0;
 }
@@ -169,21 +173,24 @@ uint32_t check_unpack_yuv42Xp_to_2_y_vectors() {
  * uvVect2
  * U5 0		V5 0	U6 0	V6 0	U7 0	V7 0	U8 0	V8	0
  */
-void	unpack_low_yuv42Xp_to_uv_vector_scalar(__m128i* input, __m128i* output) {
-	uint8_t *in = (uint8_t *) input;
-	uint16_t *out = (uint16_t *) output;
+void	unpack_low_yuv42Xp_to_uv_vector_scalar(__m128i* input_u, __m128i *input_v, __m128i* output1, __m128i *output2) {
+	uint8_t *in_u = (uint8_t *) input_u;
+    uint8_t *in_v = (uint8_t *) input_v;
+	uint16_t *out = (uint16_t *) output1;
 	uint32_t pixel_count;
 	
-	for(pixel_count = 0; pixel_count < 8; pixel_count++) {
-		*out++ = in[0];
-		*out++ = in[8];
-		in++;
+	for(pixel_count = 0; pixel_count < 16; pixel_count += 2) {
+        if (pixel_count == 8)
+            out = (uint16_t *) output2;
+
+		*out++ = *in_u++;
+		*out++ = *in_v++;
 	}
 }
 
 uint32_t check_unpack_low_yuv42Xp_to_uv_vector() {
-	CHECK_INLINE_1IN(unpack_low_yuv42Xp_to_uv_vector_scalar, unpack_low_yuv42Xp_to_uv_vector_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);	
-	
+	DO_CHECK_INLINE_2IN_2OUT(unpack_low_yuv42Xp_to_uv_vector_scalar, unpack_low_yuv42Xp_to_uv_vector_sse2, DECLARE_1_8BIT_VECT, 1, MAX_DIFF_8BIT, compare_16bit_output);
+
 	return 0;
 }
 
@@ -212,42 +219,31 @@ uint32_t check_unpack_low_yuv42Xp_to_uv_vector() {
  * uvVect2
  * U13 0	V13 0	U14 0 	V14 0	U15 0 	V15 0	U16 0	V16 0
  */
-void	unpack_high_yuv42Xp_to_uv_vector_scalar(__m128i* input, __m128i* output) {
-	uint8_t *in = (uint8_t *) input;
-	uint16_t *out = (uint16_t *) output;
+
+void	unpack_high_yuv42Xp_to_uv_vector_scalar(__m128i* input_u, __m128i *input_v, __m128i* output1, __m128i *output2) {
+	uint8_t *in_u = (uint8_t *) input_u;
+    uint8_t *in_v = (uint8_t *) input_v;
+	uint16_t *out = (uint16_t *) output1;
 	uint32_t pixel_count;
 	
-	in += 8;
-	
-	for(pixel_count = 0; pixel_count < 8; pixel_count++) {
-		*out++ = in[0];
-		*out++ = in[8];
-		in++;
+    in_v += 8;
+    in_u += 8;
+
+	for(pixel_count = 0; pixel_count < 16; pixel_count += 2) {
+        if (pixel_count == 8)
+            out = (uint16_t *) output2;
+
+		*out++ = *in_u++;
+		*out++ = *in_v++;
 	}
 }
 
+
 uint32_t check_unpack_high_yuv42Xp_to_uv_vector() {
-	CHECK_INLINE_1IN(unpack_high_yuv42Xp_to_uv_vector_scalar, unpack_high_yuv42Xp_to_uv_vector_sse2, DECLARE_1_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);	
+	DO_CHECK_INLINE_2IN_2OUT(unpack_high_yuv42Xp_to_uv_vector_scalar, unpack_high_yuv42Xp_to_uv_vector_sse2, DECLARE_1_8BIT_VECT, 1, MAX_DIFF_8BIT, compare_16bit_output);	
 	
 	return 0;
 }
-/*INLINE_NAME(unpack_high_yuv42Xp_to_uv_vector_sse2, __m128i* u_input, __m128i* v_input, __m128i* out_1_v16i_uv_vector1, __m128i* out_1_v16i_uv_vector2)
-{
-	CONST_M128I(zero_vect, 0x0LL, 0x0LL);
-	M128I(scratch, 0x0LL, 0x0LL);
-	UNALIGNED_YUVP_UV_INPUT_PREAMBLE;
-
-    _M(scratch) = _mm_unpackhi_epi8(*YUVP_U_INPUT_VECT, *YUVP_V_INPUT_VECT);
-    // U9 V9	U10 V10	U11 V11	U12 V12	U13 V13	U14 V14	U15 V15	U16 V16		// PUNPCKHBW       1	0.5
-
-	*out_1_v16i_uv_vector1 = _mm_unpacklo_epi8(_M(scratch), _M(zero_vect));
-	// U9 0		V9 0	U10 0 	V10 0	U11 0 	V11 0	U12 0 	V12 0		// PUNPCKLBW       1	0.5
-
-	*out_1_v16i_uv_vector2 = _mm_unpackhi_epi8(_M(scratch), _M(zero_vect));
-	// U13 0	V13 0	U14 0 	V14 0	U15 0 	V15 0	U16 0	V16 0		// PUNPCKHBW       1	0.5
-
-};*/
-
 
 /*
  * Unpack 1 v210 vector (6 pixels) into 2 vectors (Y, UV)
@@ -470,10 +466,59 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
  * U1617	V1617	U1819	V1819	U2021	V2021	U2223	V2223
  *
  */
-//DEFINE_UNPACK_4_V210_VECTORS(sse2_ssse3_sse41);
-//DEFINE_UNPACK_4_V210_VECTORS(sse2_ssse3);
+void unpack_4v_v210_to_y_uv_vectors_scalar(__m128i* input, __m128i* yuv1_8_out, __m128i* yuv9_16_out, __m128i* yuv17_24_out) {
+    uint32_t *src = (uint32_t *) input;
+    uint16_t *out = (uint16_t *) yuv1_8_out;
+    uint32_t  pixel_count = 0;
+
+    while(pixel_count < 24) {
+        /* Pixel 1 and 2 */
+        out[8] = *src & 0x3FF;
+        out[0] = (*src >> 10) & 0x3FF;
+        out[8 + 1] = (*src >> 20) & 0x3FF;
+        out[1] = src[1] & 0x3FF;
+        out += 2;
+
+        pixel_count += 2;
+        if (pixel_count  == 8)
+            out = (uint16_t *) yuv9_16_out;
+        else if (pixel_count == 16)
+            out = (uint16_t *) yuv17_24_out;
+
+        /* Pixel 3 and 4 */
+        out[8] = (src[1] >> 10) & 0x3FF;
+        out[0] = (src[1] >> 20) & 0x3FF;
+        out[8 + 1] = src[2] & 0x3FF;
+        out[1] = (src[2] >> 10) & 0x3FF;
+        out += 2;
+
+        pixel_count += 2;
+        if (pixel_count  == 8)
+            out = (uint16_t *) yuv9_16_out;
+        else if (pixel_count == 16)
+            out = (uint16_t *) yuv17_24_out;
+
+        /* Pixel 5 and 6 */
+        out[8] = (src[2] >> 20) & 0x3FF;
+        out[0] = src[3] & 0x3FF;
+        out[8 + 1] = (src[3] >> 10) & 0x3FF;
+        out[1] = (src[3] >> 20) & 0x3FF;
+        out += 2;
+
+        pixel_count += 2;
+         if (pixel_count  == 8)
+            out = (uint16_t *) yuv9_16_out;
+        else if (pixel_count == 16)
+            out = (uint16_t *) yuv17_24_out;
+
+        src += 4;
+    }
+}
+uint32_t check_unpack_4v_v210_to_y_uv_vectors() {
+    CHECK_INLINE_1IN_3OUT(unpack_4v_v210_to_y_uv_vectors_scalar, unpack_4v_v210_to_y_uv_vectors_sse2_ssse3, DECLARE_4_10BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output, 0, 0);
+    CHECK_INLINE_1IN_3OUT(unpack_4v_v210_to_y_uv_vectors_scalar, unpack_4v_v210_to_y_uv_vectors_sse2_ssse3_sse41, DECLARE_4_10BIT_VECT, 2, MAX_DIFF_8BIT, compare_16bit_output, 0, 0);
 
 
-
-#endif	// __INTEL_CPU__
+    return 0;
+}
 

@@ -116,6 +116,7 @@ int main(int argc, char **argv) {
 	check_unpack_yuv42Xp_to_2_y_vectors();
 	check_unpack_low_yuv42Xp_to_uv_vector();
 	check_unpack_high_yuv42Xp_to_uv_vector();
+    check_unpack_4v_v210_to_y_uv_vectors();
 	
 	return 0;
 }

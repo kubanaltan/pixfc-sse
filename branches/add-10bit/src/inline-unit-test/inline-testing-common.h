@@ -192,9 +192,9 @@ void	compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, ui
         dprintf("Checking " #inline_sse "\n");\
         /*print_xmm16u_array(ARRAY_SIZE(input), "INPUT", input); */\
 		inline_scalar(input, &scalar_out[0], &scalar_out[output_count], &scalar_out[2 * output_count]);\
-        /*print_xmm16u_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out); */\
+        /* print_xmm16u_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out); */\
 		inline_sse(input, &sse_out[0], &sse_out[output_count], &sse_out[2 * output_count]);\
-        /*print_xmm16u_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out); */\
+        /* print_xmm16u_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out); */\
 		compare_fn(check_last1, scalar_out, sse_out, output_count, max_diff, #inline_sse " output vect 1");\
         compare_fn(check_last23, &scalar_out[output_count], &sse_out[output_count], output_count, max_diff, #inline_sse " output vect 2");\
         compare_fn(check_last23, &scalar_out[2 * output_count], &sse_out[2 * output_count], output_count, max_diff, #inline_sse " output vect 3");\
@@ -312,6 +312,29 @@ void	compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, ui
         DO_CHECK_INLINE_2IN(inline_prefix ## scalar, inline_prefix ## sse2, input_type, output_count, max_diff, compare_fn);\
         DO_CHECK_INLINE_2IN(inline_prefix ## scalar, inline_prefix ## sse2_ssse3, input_type, output_count, max_diff, compare_fn);\
     } while(0)
+
+#define DO_CHECK_INLINE_2IN_2OUT(inline_scalar, inline_sse, input_type, output_count, max_diff, compare_fn)\
+	do {\
+        input_type(input1);\
+        input_type(input2);\
+        __m128i scalar_out[2 * output_count] = {{0x0LL, 0x0LL}};\
+        __m128i sse_out[2 * output_count] = {{0x0LL, 0x0LL}};\
+        dprintf("Checking " #inline_sse "\n");\
+		/* print_xmm8u_array(ARRAY_SIZE(input1), "INPUT1 SCALAR ", input1);\
+		print_xmm8u_array(ARRAY_SIZE(input2), "INPUT2 SCALAR", input2); */\
+		inline_scalar(input1, input2, &scalar_out[0], &scalar_out[output_count]);\
+		/* print_xmm16u_array(output_count, "SCALAR_OUTPUT vect 1", scalar_out);\
+        print_xmm16u_array(output_count, "SCALAR_OUTPUT vect 2", &scalar_out[output_count]);\
+        print_xmm16u_array(ARRAY_SIZE(input1), "INPUT1 SCALAR ", input1);\
+		print_xmm16u_array(ARRAY_SIZE(input2), "INPUT2 SCALAR", input2); */\
+		inline_sse(input1, input2, &sse_out[0], &sse_out[output_count]);\
+		/* print_xmm16u_array(output_count, "SSE_OUT vect 1", sse_out);\
+        print_xmm16u_array(output_count, "SSE_OUT vect 2", &sse_out[output_count]); */\
+		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse " output vect 1");\
+        compare_fn(0, &scalar_out[output_count], &sse_out[output_count], output_count, max_diff, #inline_sse "output vect 2");\
+    } while (0)
+
+
 
 #define DO_CHECK_INLINE_3IN(inline_scalar, inline_sse, input1_type, input2_type, input3_type, output_count, max_diff, compare_fn)\
 	do {\

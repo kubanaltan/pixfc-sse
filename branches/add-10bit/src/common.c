@@ -75,6 +75,26 @@ INLINE uint64_t		get_cpu_features() {
 	return cpu_features;
 }
 
+#ifdef FAKE_SSE41_BLENDV
+#define _mm_blendv_epi8 _fake_mm_blendv_epi8
+__m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
+    char *m = (char *)&mask;
+    __m128i result = {0x0LL, 0x0LL};
+    char *dest = (char*) &result;
+    char *s1 = (char*)&v1;
+    char *s2 = (char*)&v2;
+    int i = 0;
+
+    for (i = 0; i < 16; i++) {
+        if (m[i] & 0xFF)
+            dest[i] = s2[i];
+        else
+            dest[i] = s1[i];
+    }
+
+    return result;
+}
+#endif
 
 
 #ifdef DEBUG
