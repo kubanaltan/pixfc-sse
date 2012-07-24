@@ -117,6 +117,10 @@ int main(int argc, char **argv) {
 	check_unpack_low_yuv42Xp_to_uv_vector();
 	check_unpack_high_yuv42Xp_to_uv_vector();
     check_unpack_4v_v210_to_y_uv_vectors();
+
+    // YUV upsample
+    check_reconstruct_last_missing_uv();
+    check_reconstruct_missing_uv();
 	
 	return 0;
 }
