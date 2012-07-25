@@ -249,8 +249,8 @@ void	compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, ui
 		inline_scalar(input, scalar_out);\
         /* print_xmm16_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out); */\
 		inline_sse(input, sse_out);\
-        /* print_xmm16_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);\
-		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse); */\
+        /* print_xmm16_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out); */\
+		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse);\
 	} while (0)
 
 
