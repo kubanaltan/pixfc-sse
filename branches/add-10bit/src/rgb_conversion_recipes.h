@@ -324,14 +324,14 @@
 	RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 		unpack_fn_prefix##instr_set,\
 		avg_422_downsample_first_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
-		avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
+		avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
 		y_conv_fn, uv_conv_fn);\
 	pack_lo_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 	yplane_out++;\
 	RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 			unpack_fn_prefix##instr_set,\
 			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
 			y_conv_fn, uv_conv_fn);\
 	pack_hi_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 	yplane_out++;\
@@ -341,14 +341,14 @@
 		RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 			unpack_fn_prefix##instr_set,\
 			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
 			y_conv_fn, uv_conv_fn);\
 		pack_lo_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 		yplane_out++;\
 		RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 			unpack_fn_prefix##instr_set, \
 			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
 			y_conv_fn, uv_conv_fn);\
 		pack_hi_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 		yplane_out++;\
