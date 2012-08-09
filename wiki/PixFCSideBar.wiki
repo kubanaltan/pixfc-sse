@@ -1,6 +1,6 @@
 #summary SideBar for PixFC's wiki.
 
- * [HowToUse How to get started with PixFC]
- * [ConversionTiming How fat is PixFC]
+ * [HowToUse Getting started with PixFC]
+ * [ConversionTiming How fast is PixFC]
  * [GettingHelp Getting help with PixFC]
  * [BuildingPixFC Building PixFC]
