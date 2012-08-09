@@ -1,15 +1,17 @@
 #summary how to use pixfc-sse
 #labels Featured,Phase-Deploy
 
-The fastest way to test PixFC and include it in your application is to:
+The fastest way to test PixFC and/or include it in your application is to:
  * [HowToUse#Download_PixFC Download the PixFC binaries]
  * [HowToUse#Include_PixFC_in_your_project Include PixFC in your project]
 
-Instead of downloading the pre-built binaries, you can also download the source code and [HowToUse#Build_PixFC build PixFC yourself] (longer).
+Instead of downloading the pre-built binaries, you can also download the source code and [BuildingPixFC build PixFC yourself] (much longer).
  
-= Download PixFC=
+= Download and test PixFC=
 
-Head to the [http://code.google.com/p/pixfc-sse/downloads/list Downloads] tab for a list of latest stable packages, and pick *the binary package which matches your platform*. If your OS supports 64-bit, make sure you grab a 64-bit binary package ! After unpacking the archive, you can run the `unit-testing` app to see how well PixFC performs on you platform. You can compare your results with [ConversionTiming these]. Please take some time to submit your results on the [http://groups.google.com/group/pixfc-sse mailing list], along with details of your platform (OS version, CPU name & model).
+Head to the [http://code.google.com/p/pixfc-sse/downloads/list Downloads] tab for a list of latest stable packages, and pick *the binary package which matches your platform*. If your OS supports 64-bit, make sure you grab a 64-bit binary package ! 
+
+After unpacking the archive, you can run the `time_conversions` app to see how fast PixFC performs on you platform. You can compare your results with [ConversionTiming these]. Please take some time to submit your results on the [http://groups.google.com/group/pixfc-sse mailing list], along with details of your platform (OS version, CPU name & model).
 
 = Include PixFC in your project =
 
@@ -19,59 +21,10 @@ Assuming you unpacked the PixFC archive in `pixfc/`, either :
 
 Next, `#include "pixfc-sse.h"` where appropriate (so you can call PixFC functions). The use-case is then pretty simple:
  * Create a `struct PixFcSSE` by calling `create_pixfc(...)`. You specify the input and output formats, resolution, and optional flags to control the selection of the conversion routine.
- * Then, every time you need to convert an image, call `struct PixFcSSE->convert(...)`. Note that better performance is achieved when the input and output buffers are 16-byte aligned.
+ * Then, every time you need to convert an image, call `struct PixFcSSE->convert(...)`. Note that *better performance is achieved when the input and output buffers are 16-byte aligned, but they dont have to be 16-byte aligned*.
  * Release the `struct PixFcSSE` when you no longer need it by calling `destroy_pixfc(...)`.
 
-Take a look at `pixfc/example.c` for a concrete example.
+Take a look at `pixfc/example.c` for a concrete example. The main header file (`pixfc-sse.h`) is also a good source of information.
 
 Last, link the PixFC static library (`pixfc/libpixfc-sse.a` on Mac & Linux, `pixfc/pixfc-sse.lib` on Windows) to your application. On Linux, also link your application against librt by passing `-lrt` to the linker.
 That's it !.
-
-
-= Build PixFC=
-
-*These instructions are ONLY for those who want to compile PixFC instead of using the provided binaries. You do not need to do this if you have followed the instructions above.*
-
-Make sure you install [http://www.cmake.org CMake] before continuing. Also download the PixFC source archive from the [http://code.google.com/p/pixfc-sse/downloads/list Downloads] tab and unpack it (let's assume it is unpacked in `pixfc`). Next, follow the instructions for your platform / environment. These will help you compile the PixFC library for a specific target platform or for the platform you will compile PixFC on.
-
-== Windows - Visual Studio solution ==
-
-Run a command prompt and assuming the PixFC source directory is `pixfc/`, change to `pixfc\build\`.
-
-Then run either of the following command depending on the version of Visual Studio and whether you want to compile PixFC in 32- or 64-bit mode:
-{{{
-cmake -G "Visual Studio 9 2008" ..
-}}}
-{{{
-cmake -G "Visual Studio 9 2008 Win64" ..
-}}}
-{{{
-cmake -G "Visual Studio 10" ..
-}}}
-{{{
-cmake -G "Visual Studio 10 Win64" ..
-}}}
-
-This will generate a Visual Studio solution (`pixfc-sse.sln`). Open it, make sure the build configuration is set to Release and build the solution.
-The PixFC library (`pixfc-sse.lib`) can then be found in the `src/Release` directory.
-
-== Mac & Linux - Makefile ==
-
-In a terminal, change to `pixfc/build` and run the following commands:
-{{{
-cmake ..
-make
-}}}
-
-This will build PixFC library (`libpixfc-sse.a`) in `src`.
-
-== All Platforms - Eclipse CDT 4 ==
-
-From a terminal / command prompt, change to `pixfc/build` and run:
-{{{
-cmake -G "Eclipse CDT 4 - Unix Makefiles" ..
-}}}
-Then, copy `.project` and `.cproject` one directory up and import the project in Eclipse to build it.
-
-
-The next step is to include PixFC in you project and use it as described [HowToUse#Include_PixFC_in_your_project here].
