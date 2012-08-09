@@ -1,5 +1,6 @@
 #summary how to use pixfc-sse
 #labels Featured,Phase-Deploy
+#sidebar PixFCSideBar
 
 The fastest way to test PixFC and/or include it in your application is to:
  * [HowToUse#Download_PixFC Download the PixFC binaries]
