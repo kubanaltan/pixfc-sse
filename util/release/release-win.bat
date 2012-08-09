@@ -15,13 +15,8 @@ if "%2"=="" (
 
 :: Check the version of Visual Studio
 if NOT EXIST "%VS100COMNTOOLS%\vsvars32.bat" (
-	if NOT EXIST "%VS90COMNTOOLS%\vsvars32.bat" (
-		echo Cannot find Visual Studio
+		echo Cannot find Visual Studio 2010
 		exit /B 1
-	) else (
-		set cmake_gen=Visual Studio 9 2008
-		call "%VS90COMNTOOLS%\vsvars32.bat"
-	)
 ) else (
 	call "%VS100COMNTOOLS%\vsvars32.bat"
 	set cmake_gen=Visual Studio 10
@@ -97,7 +92,7 @@ copy /A README.win "%destdir%\README"
 copy /A COPYING "%destdir%\"
 copy /A "%1\example.c" "%destdir%\"
 copy /A "%1\Changelog" "%destdir%\"
-copy /B "%build_dir%\tools\Release\unit-testing.exe" "%destdir%\"
+copy /B "%build_dir%\tools\Release\time_conversions.exe" "%destdir%\"
 
 :: create zip file
 if EXIST "%archive_name%.zip" (

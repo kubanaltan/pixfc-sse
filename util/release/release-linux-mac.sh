@@ -43,7 +43,7 @@ function do_build_and_zip ()
 	cp COPYING "${destdir}/"
 	cp "${pixfc_dir}/example.c" "${destdir}/"
 	cp "${pixfc_dir}/Changelog" "${destdir}/"
-	cp "${build_dir}/tools/unit-testing" "${destdir}/"
+	cp "${build_dir}/tools/time_conversions" "${destdir}/"
 
 	# create tar file
 	tar -zcvf "${destdir}_${os}-${arch}.tar.gz" "${destdir}"

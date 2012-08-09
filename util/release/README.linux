@@ -14,7 +14,7 @@ http://pixfc-sse.googlecode.com
 
 
 == PERFORMANCE TESTING ==
-Run unit-testing to check how PixFC performs on you machine.
+Run time_conversions to check how fast PixFC performs on your machine.
 
 
 == HOWTO ==
@@ -36,7 +36,8 @@ simple:
 - Release the struct PixFcSSE when you no longer need it by calling
   destroy_pixfc(...).
 
-Take a look at example.c for a concrete example.
+Take a look at the pixfc-sse.h header file and at example.c for a concrete 
+example.
 
 
 == LINKING ==
