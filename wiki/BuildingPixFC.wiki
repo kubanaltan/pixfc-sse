@@ -10,7 +10,7 @@ PixFC can be built either on Mac, Windows or Linux. However, you must pay attent
 
 || *OS* || *Version* || *Toolchain* || *Version* ||
 || Linux || Ubuntu 10.04 || gcc || Ubuntu 4.4.3-4ubuntu5 4.4.3 ||
-|| Linux || Ubuntu 12.04 || gcc || Ubuntu 4.4.3-4ubuntu5 4.4.3  ||
+|| Linux || Ubuntu 12.04 || gcc || Ubuntu/Linaro 4.6.3-1ubuntu5 4.6.3  ||
 || OSX || 10.6.6 || gcc || i686-apple-darwin10-gcc-4.2.1 4.2.1 (Apple Inc. build 5664)|| 
 || OSX || 10.7.4 || clang || Apple clang version 3.1 (tags/Apple/clang-318.0.58) (based on LLVM 3.1svn) ||
 || Windows || 7 home edition || Visual Studio || 2010 ||
