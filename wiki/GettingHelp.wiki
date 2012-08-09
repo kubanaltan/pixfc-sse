@@ -1,4 +1,5 @@
 #summary where to get help
 #labels Phase-Support
+#sidebar PixFCSideBar
 
 Please report any issues and ask your questions on the PixFC mailing list at http://groups.google.com/group/pixfc-sse
