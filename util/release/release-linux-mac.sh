@@ -3,7 +3,7 @@
 function do_build_and_zip ()
 {
 	pixfc_dir="$1"
-	cmake_arg="$2"
+	cmake_toolchain_file="$2"
 	version="$3"
 	os="$4"
 	arch="$5"
@@ -23,7 +23,7 @@ function do_build_and_zip ()
 	fi
 
 	# Build pixfc
-	cmake "${cmake_arg}"  ../.. || { echo "CMake failed"; popd; exit 1; }
+	cmake "-DCMAKE_TOOLCHAIN_FILE=../../cmake/${cmake_toolchain_file}"  ../.. || { echo "CMake failed"; popd; exit 1; }
 	make -j ${num_cpus} || { echo "Build failed"; popd; exit 1;  }
 
 	# Go back to where we were invoked from
@@ -58,16 +58,15 @@ if [ $# -ne 3 ]; then
 fi
 
 # check OS
-os="linux"
-echo $OSTYPE | grep -q "linux" || { os="osx"; }
+echo $OSTYPE | grep -q "linux"
+if [ $? -eq 0 ]; then
+		#do Linux 64-bit build
+		do_build_and_zip "$1" "Toolchain-linux-x86_64-gcc.cmake" $2 linux x86_64 $3
 
-# check arch
-native_arch="x86"
-other_arch="x86_64"
-other_arch_cc_compile_flag="-m64"
-echo $MACHTYPE | grep -q "x86_64" && { native_arch="x86_64"; other_arch="x86"; other_arch_cc_compile_flag="-m32"; }
-
-# do build	
-do_build_and_zip $1 "" $2 "${os}" "${native_arch}" $3
-do_build_and_zip $1 "-DCMAKE_C_FLAGS=${other_arch_cc_compile_flag}" $2 "${os}" "${other_arch}" $3
+		#do Linux 32-bit build
+		do_build_and_zip "$1" "Toolchain-linux-x86-gcc.cmake" $2 linux x86 $3
+else
+		#do osx 64-bit build
+		do_build_and_zip "$1" "Toolchain-darwin-x86_64-clang.cmake" $2 osx x86_64 $3
+fi
 
