@@ -1,4 +1,5 @@
 #summary How to build PixFC
+#sidebar PixFCSideBar
 
 *These instructions are ONLY for those who want to compile PixFC manually instead of using the provided binary packages. You do not need to do this if you have followed the instructions on the HowToUse page.*
 
