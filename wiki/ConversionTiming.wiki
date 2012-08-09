@@ -1,5 +1,6 @@
 #summary what conversions are supported and how fast is PixFC
 #labels Featured
+#sidebar PixFCSideBar
 
 == Hardware platforms ==
 PixFC-SSe has been tested on Windows, Linux and Mac OSX on the following platforms:
