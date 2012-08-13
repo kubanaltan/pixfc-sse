@@ -26,10 +26,20 @@ function do_build_and_zip ()
 	cmake "-DCMAKE_TOOLCHAIN_FILE=../../cmake/${cmake_toolchain_file}"  ../.. || { echo "CMake failed"; popd; exit 1; }
 	make -j ${num_cpus} || { echo "Build failed"; popd; exit 1;  }
 
+	# Run validate-output
+	pushd ..
+	./temp/tools/validate-output > /tmp/validate-output.tmp 2>&1
+	if [ $? -ne 0 ]; then
+		echo "Unable to validate output"
+		echo "Check /tmp/validate-output.tmp for details"
+		exit 1
+	fi
+	popd
+
 	# Go back to where we were invoked from
 	popd
 
-	destdir="PixFC-SSE-${version}"
+	destdir="PixFC-SSE-${version}_${os}_${arch}"
 
 	# create temp dir
 	rm -Rf "${destdir}"
@@ -45,8 +55,9 @@ function do_build_and_zip ()
 	cp "${pixfc_dir}/Changelog" "${destdir}/"
 	cp "${build_dir}/tools/time_conversions" "${destdir}/"
 
+
 	# create tar file
-	tar -zcvf "${destdir}_${os}-${arch}.tar.gz" "${destdir}"
+	tar -zcvf "${destdir}.tar.gz" "${destdir}"
 
 	rm -Rf "${destdir}"
 }
