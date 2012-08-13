@@ -36,7 +36,6 @@ if NOT EXIST "%1" (
 set destdir=PixFC-SSE-%2_win32
 set build_arch=32
 set build_dir="%1\build\temp"
-set archive_name="%destdir%"
 if EXIST "C:\Program Files\7-Zip\7z.exe" (
 	set zip_cmd="C:\Program Files\7-Zip\7z.exe"
 ) else (
@@ -68,20 +67,21 @@ if NOT %ERRORLEVEL% EQU 0 (
 devenv PixFC-SSE.sln /clean Release
 devenv PixFC-SSE.sln /build Release
 if NOT %ERRORLEVEL% EQU 0 (
-	echo Build falied
+	echo Build failed
 	popd
 	exit /B 1
 )
 
 :: Validate output
 pushd ..
-tools\Release\validate-output
+temp\tools\Release\validate-output > output.tmp 2>&1
 if NOT %ERRORLEVEL% EQU 0 (
 	echo Unable to validate the output
 	popd
 	popd
 	exit /B 1
 )
+popd
 
 :: Go back to where we were invoked from
 popd
@@ -106,10 +106,10 @@ copy /B "%build_dir%\tools\Release\time_conversions.exe" "%destdir%\"
 
 
 :: create zip file
-if EXIST "%archive_name%.zip" (
-	del "%archive_name%.zip"
+if EXIST "%destdir%.zip" (
+	del "%destdir%.zip"
 )
-%zip_cmd% a -tzip "%archive_name%.zip" "%destdir%"
+%zip_cmd% a -tzip "%destdir%.zip" "%destdir%"
 
 :: Delete temp dir
 if EXIST %destdir% (
@@ -121,6 +121,5 @@ if "%build_arch%"=="32" (
 	set destdir=PixFC-SSE-%2_win64
 	set build_arch=64
 	set cmake_gen=%cmake_gen% Win64
-	set archive_name="%destdir%"
 	goto do_build
 )
