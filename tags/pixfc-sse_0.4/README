@@ -1,0 +1,37 @@
+PixFC-SSE is a cross platform C library which provides SSE-optimised functions
+to perform pixel format conversions efficiently.
+
+You provide the input / output buffers and formats, PixFC-SSE selects the best 
+conversion function to use based on the features supported by your CPU. In the 
+worst case scenario, PixFC-SSE falls back to a standard, non-SSE optimised 
+conversion function if the CPU has no SSE features. This way, PixFC-SSE 
+guarantees the conversion will always happen.
+
+
+The latest version of PixFC-SSE can be found at 
+http://pixfc-sse.googlecode.com
+
+
+== USAGE ==
+PixFC comes with a simple command-line app (time_conversions) to quickly test 
+how fast it performs on a machine.
+
+Using PixFC in your own application is simple:
+- you first build PixFC as a static library (or download a binary package 
+  containing a pre-compiled PixFC static library from the website),
+- update your application to use the conversion functions in PixFC and,
+- link the PixFC static library to your application.
+
+Please refer to the PixFC wiki at http://pixfc-sse.googlecode.com for the
+latest instructions on how to :
+- build PixFC from source,
+- test PixFC's performance
+- include PixFC in your application.
+
+
+== SUPPORT / CONTACT ==
+Feedback, comments and suggestions are greatly appreciated.
+Please, use the mailing list at 
+http://groups.google.com/group/pixfc-sse
+
+
