@@ -1,0 +1,18 @@
+PixFC-SSE TODO list:
+
+* optimise RGB24_TO_V210_NNB_LOOP_CORE
+* optimise yuv_to_rgb inline (use 8-bit left shifted coefs where possible) 
+* Investigate if 8-bit left-shifted coefficients can be used and whether they 
+  provide acceptable results for yuv to rgb inlines
+* Investigate where to place prefetching instructions and check its 
+  platform dependency
+* Update non-SSE conversion routines to perform resampling.
+* Add support for more pixel formats:
+  - VYUY, YVYU
+  - planar formats (YUV410, YVU410)
+  - packed RGB, grey and bayer formats.
+* Improve perf by distributing conversion over many threads (OpenMP)
+* Add SSE4.1 version of routines which use blending (up/down sampling for 
+  instance)
+* Some other things I cant think of.
+
